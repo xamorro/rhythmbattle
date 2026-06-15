@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Creador de Mapas - Guardar Canción</title>
+    <style>
+        body { background: #1a1a1a; color: white; font-family: 'Segoe UI', sans-serif; text-align: center; padding: 20px; }
+        .container { display: flex; justify-content: center; gap: 30px; margin-top: 20px; }
+        #audio-panel { background: #000; padding: 30px; border-radius: 8px; width: 500px; display: flex; flex-direction: column; justify-content: center; align-items: center; border: 2px solid #333; }
+        #editor-panel { background: #2a2a2a; padding: 20px; border-radius: 8px; width: 350px; text-align: left; }
+        
+        .file-select-zone { border: 2px dashed #555; padding: 30px; border-radius: 6px; width: 90%; text-align: center; margin-bottom: 20px; background: #111; cursor: pointer; }
+        .file-select-zone:hover { border-color: #2ed573; }
+        input[type="file"], input[type="text"] { width: 100%; padding: 10px; background: #111; border: 1px solid #555; color: white; border-radius: 4px; box-sizing: border-box; }
+        input[type="text"] { margin-bottom: 15px; background: #333; font-size: 14px; }
+        input[type="file"] { display: none; }
+
+        .pad-container { display: flex; justify-content: space-between; margin: 15px 0; }
+        .pad { width: 60px; height: 60px; border: 2px solid #555; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 20px; background: #333; transition: all 0.05s ease; user-select: none; }
+        .pad.active-S { background: #ff4757; box-shadow: 0 0 15px #ff4757; color: white; transform: scale(0.95); }
+        .pad.active-D { background: #2ed573; box-shadow: 0 0 15px #2ed573; color: white; transform: scale(0.95); }
+        .pad.active-K { background: #ffa502; box-shadow: 0 0 15px #ffa502; color: white; transform: scale(0.95); }
+        .pad.active-L { background: #1e90ff; box-shadow: 0 0 15px #1e90ff; color: white; transform: scale(0.95); }
+
+        audio { width: 100%; margin-top: 20px; }
+        textarea { width: 100%; height: 120px; background: #111; color: #2ed573; border: 1px solid #555; border-radius: 4px; font-family: monospace; padding: 10px; box-sizing: border-box; resize: none; font-size: 11px; }
+        button { background: #2ed573; color: black; border: none; padding: 12px 15px; font-weight: bold; border-radius: 4px; cursor: pointer; width: 100%; margin-top: 10px; font-size: 14px; }
+        button:hover { background: #26af5f; }
+        .btn-nav { background: #1e90ff; color: white; margin-bottom: 20px; width: auto; display: inline-block; padding: 10px 20px; }
+        .btn-nav:hover { background: #1173d6; }
+    </style>
+</head>
+<body>
+
+    <button class="btn-nav" onclick="window.location.href='menu.html'">⬅️ Volver al Menú Principal</button>
+    <h1>🎙️ Creador de Niveles</h1>
+    <p>Selecciona una canción en MP3, ponle un nombre, dale a Play y presiona las teclas al ritmo.</p>
+
+    <div class="container">
+        <div id="audio-panel">
+            <div class="file-select-zone" onclick="document.getElementById('audio-file').click()">
+                <p id="file-label">🎵 Haz clic para seleccionar tu canción (.mp3)</p>
+                <input type="file" id="audio-file" accept="audio/*">
+            </div>
+            
+            <label style="align-self: flex-start; margin-bottom: 5px; color: #aaa;">Nombre de la canción en el juego:</label>
+            <input type="text" id="song-name" placeholder="Ej: Mi Canción Favorita">
+
+            <audio id="audio-player" controls></audio>
+            <div style="margin-top:10px; color: #aaa;" id="track-time">Tiempo: 0.00s</div>
+            
+            <button id="save-btn" style="background: #1e90ff; color: white; margin-top: 25px; font-size: 16px;">💾 Guardar Canción en el Juego</button>
+        </div>
+
+        <div id="editor-panel">
+            <h3 style="margin-top:0;">Teclas (S, D, K, L)</h3>
+            <div class="pad-container">
+                <div id="pad-S" class="pad">S</div>
+                <div id="pad-D" class="pad">D</div>
+                <div id="pad-K" class="pad">K</div>
+                <div id="pad-L" class="pad">L</div>
+            </div>
+            <p>Notas grabadas: <strong id="note-count" style="color: #2ed573;">0</strong></p>
+            <textarea id="json-output" readonly placeholder="El código JSON aparecerá aquí automáticamente..."></textarea>
+            <button onclick="clearMap()" style="background:#ff4757; color:white;">Reiniciar Mapa</button>
+        </div>
+    </div>
+
+    <script>
+        const audioInput = document.getElementById('audio-file');
+        const audioPlayer = document.getElementById('audio-player');
+        const fileLabel = document.getElementById('file-label');
+        const trackTimeTxt = document.getElementById('track-time');
+        const songNameInput = document.getElementById('song-name');
+        
+        let generatedMap = [];
+        let selectedFileName = "";
+        const validKeys = ['S', 'D', 'K', 'L'];
+
+        // Cargar archivo de audio local
+        audioInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                selectedFileName = file.name;
+                fileLabel.innerText = "🎵 Cargado: " + file.name;
+                // Auto-rellenar el nombre quitando la extensión .mp3
+                songNameInput.value = file.name.replace(/\.[^/.]+$/, ""); 
+                audioPlayer.src = URL.createObjectURL(file);
+                clearMap(false);
+            }
+        });
+
+        // Mostrar el tiempo transcurrido
+        audioPlayer.addEventListener('timeupdate', () => {
+            trackTimeTxt.innerText = `Tiempo: ${audioPlayer.currentTime.toFixed(2)}s`;
+        });
+
+        // Capturar pulsaciones
+        window.addEventListener('keydown', (e) => {
+            if (!audioPlayer.src || audioPlayer.paused) return;
+            const key = e.key.toUpperCase();
+            if (validKeys.includes(key)) {
+                e.preventDefault(); 
+                const exactTime = parseFloat(audioPlayer.currentTime.toFixed(3));
+                
+                // Evitar spam por mantener pulsada la tecla
+                if (generatedMap.length > 0) {
+                    const lastNote = generatedMap[generatedMap.length - 1];
+                    if (lastNote.key === key && Math.abs(lastNote.time - exactTime) < 0.05) return;
+                }
+
+                generatedMap.push({ time: exactTime, key: key });
+                generatedMap.sort((a, b) => a.time - b.time);
+                updateUI(key);
+            }
+        });
+
+        // Quitar la animación visual al soltar la tecla
+        window.addEventListener('keyup', (e) => {
+            const key = e.key.toUpperCase();
+            if (validKeys.includes(key)) {
+                const pad = document.getElementById(`pad-${key}`);
+                if (pad) pad.className = `pad`;
+            }
+        });
+
+        function updateUI(activeKey) {
+            const pad = document.getElementById(`pad-${activeKey}`);
+            if (pad) pad.classList.add(`active-${activeKey}`);
+            document.getElementById('note-count').innerText = generatedMap.length;
+            document.getElementById('json-output').value = JSON.stringify(generatedMap);
+        }
+
+        function clearMap(askConfirm = true) {
+            if (askConfirm && !confirm("¿Seguro que quieres borrar todas las notas actuales?")) return;
+            generatedMap = [];
+            document.getElementById('note-count').innerText = "0";
+            document.getElementById('json-output').value = "";
+        }
+
+        // Guardar la canción en localStorage
+        document.getElementById('save-btn').addEventListener('click', () => {
+            const title = songNameInput.value.trim();
+            if (!title) {
+                alert("Por favor, ponle un nombre a la canción.");
+                return;
+            }
+            if (generatedMap.length === 0) {
+                alert("Primero debes grabar algunas notas antes de guardar.");
+                return;
+            }
+
+            const customSong = {
+                name: title,
+                fileName: selectedFileName,
+                map: generatedMap
+            };
+
+            let savedSongs = JSON.parse(localStorage.getItem('custom_rhythm_songs')) || [];
+            
+            const existingIndex = savedSongs.findIndex(s => s.name === title);
+            if(existingIndex !== -1) {
+                if(!confirm("Ya existe una canción con este nombre. ¿Quieres sobrescribirla?")) return;
+                savedSongs[existingIndex] = customSong;
+            } else {
+                savedSongs.push(customSong);
+            }
+
+            localStorage.setItem('custom_rhythm_songs', JSON.stringify(savedSongs));
+            alert(`¡Canción "${title}" guardada con éxito! Ya puedes volver al juego a probarla.`);
+        });
+    </script>
+</body>
+</html>

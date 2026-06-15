@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Rhythm Battle Arena</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Pequeño ajuste para navegación de regreso */
+        .nav-back {
+            display: inline-block;
+            margin-top: 15px;
+            color: #a5b1c2;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+        .nav-back:hover { color: #ff4757; }
+        .highscore-ui-color { color: #ffa502 !important; }
+    </style>
+</head>
+<body>
+
+    <h1 id="game-title">⚔️ Rhythm Battle Arena ⚔️</h1>
+    
+    <div id="battle-ui">
+        <div class="ui-box">
+            <h3 id="heart-title">❤️ Tu Vida</h3>
+            <div id="player-hearts">❤️❤️❤️</div>
+        </div>
+        
+        <div id="boss-zone">
+            <div id="boss-active-ui">
+                <h3 id="boss-name">👿 Rey Ritmo</h3>
+                <div id="boss-health-bar"><div id="boss-health-fill"></div></div>
+                <div id="boss-dialogue">"¡Prepárate para el ritmo!"</div>
+            </div>
+            <div id="game-message" style="display: none;"></div>
+        </div>
+
+        <div class="ui-box">
+            <h3 id="score-title">⚔️ Combos Completados</h3>
+            <div id="combo-counter" style="font-size: 24px; font-weight: bold; color: #ffa502;">0 / 10</div>
+        </div>
+    </div>
+
+    <div id="main-layout">
+        <div id="game-area">
+            <button id="start-btn">¡Empezar Batalla!</button>
+            
+            <div id="game-container">
+                <div id="lane-S" class="lane"></div>
+                <div id="lane-D" class="lane"></div>
+                <div id="lane-K" class="lane"></div>
+                <div id="lane-L" class="lane"></div>
+                
+                <div id="hit-bar"></div>
+                
+                <div class="key-indicator" style="left:0%;">S</div>
+                <div class="key-indicator" style="left:25%;">D</div>
+                <div class="key-indicator" style="left:50%;">K</div>
+                <div class="key-indicator" style="left:75%;">L</div>
+            </div>
+            
+            <a href="menu.html" class="nav-back">⬅️ Volver al Menú Principal</a>
+        </div>
+    </div>
+
+    <script src="juego.js"></script>
+</body>
+</html>

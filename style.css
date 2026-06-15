@@ -1,0 +1,157 @@
+body {
+    background: #0f0c1b;
+    color: white;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    text-align: center;
+    margin: 0;
+    padding-bottom: 50px;
+}
+
+/* --- UI de Batalla --- */
+#battle-ui {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+    max-width: 900px;
+    margin: 15px auto;
+    background: #161224;
+    padding: 15px;
+    border-radius: 8px;
+    border: 2px solid #3d2f5c;
+}
+
+.ui-box { width: 180px; }
+#player-hearts { font-size: 28px; color: #ff4757; letter-spacing: 2px; }
+
+#boss-zone { flex-grow: 1; text-align: center; }
+#boss-name { margin: 0 0 5px 0; color: #ff4757; }
+#boss-health-bar {
+    width: 100%; height: 20px; background: #222; 
+    border-radius: 10px; border: 2px solid #555; overflow: hidden;
+}
+#boss-health-fill {
+    width: 100%; height: 100%; background: #ff4757;
+    transition: width 0.3s ease-out;
+}
+#boss-dialogue {
+    margin-top: 8px; font-style: italic; color: #a5b1c2; font-size: 14px;
+    min-height: 20px;
+}
+
+/* --- Distribución del Juego --- */
+#main-layout { display: flex; justify-content: center; margin-top: 10px; }
+#game-area { position: relative; width: 400px; }
+#game-container {
+    position: relative; width: 100%; height: 600px; background: #110e1a;
+    overflow: hidden; border: 4px solid #3d2f5c; border-radius: 10px;
+    box-shadow: 0 0 30px rgba(155, 89, 182, 0.2);
+}
+
+/* --- Carriles y Efectos --- */
+.lane { position: absolute; top: 0; width: 25%; height: 100%; border-right: 1px dashed #2c2542; box-sizing: border-box; transition: background 0.1s; }
+.lane:last-child { border-right: none; }
+#lane-S { left: 0%; } #lane-D { left: 25%; } #lane-K { left: 50%; } #lane-L { left: 75%; }
+
+.lane.pressing { background: rgba(255, 255, 255, 0.05); }
+.lane.hit-flash { animation: flashGreen 0.2s ease-out; }
+.lane.miss-flash { animation: flashRed 0.3s ease-out, shake 0.3s linear; }
+
+/* --- Notas --- */
+.note { position: absolute; width: 80%; left: 10%; height: 20px; border-radius: 5px; }
+.note.S { background: #ff4757; box-shadow: 0 0 10px #ff4757; } 
+.note.D { background: #2ed573; box-shadow: 0 0 10px #2ed573; } 
+.note.K { background: #ffa502; box-shadow: 0 0 10px #ffa502; } 
+.note.L { background: #1e90ff; box-shadow: 0 0 10px #1e90ff; } 
+
+#hit-bar {
+    position: absolute; bottom: 50px; width: 100%; height: 10px;
+    background: rgba(255,255,255,0.2); border-top: 2px solid white; border-bottom: 2px solid white;
+}
+.key-indicator { position: absolute; bottom: 10px; width: 25%; font-weight: bold; font-size: 20px; color: #4e4376; }
+
+#start-btn {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    z-index: 10; background: #ff4757; border: none; padding: 15px 30px;
+    font-size: 18px; font-weight: bold; border-radius: 5px; cursor: pointer; color: white;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+}
+
+@keyframes flashGreen { 0% { background: rgba(46, 213, 115, 0.5); } 100% { background: rgba(46, 213, 115, 0); } }
+@keyframes flashRed { 0% { background: rgba(255, 71, 87, 0.5); } 100% { background: rgba(255, 71, 87, 0); } }
+@keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-5px); } 40%, 80% { transform: translateX(5px); } }
+
+/* --- ANIMACIÓN DE ATAQUE AL JURADO (DAÑO) --- */
+.damage-projectile {
+    position: absolute;
+    bottom: 50px; /* Sale desde la hit-bar */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 20px;
+    height: 60px;
+    background: linear-gradient(to top, rgba(30, 144, 255, 0), #ffa502, #ffffff);
+    box-shadow: 0 0 20px #ffa502, 0 0 40px #ff4757;
+    border-radius: 50% 50% 0 0;
+    z-index: 5;
+    pointer-events: none; /* No interrumpe los clics */
+    animation: shootUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes shootUp {
+    0% {
+        bottom: 50px;
+        height: 60px;
+        opacity: 1;
+        scale: 1;
+    }
+    80% {
+        opacity: 1;
+    }
+    100% {
+        bottom: 580px; /* Llega al borde superior de la pista */
+        height: 120px;
+        opacity: 0;
+        scale: 0.3;
+    }
+}
+
+/* Efecto de sacudida y flash rojo en la barra del jefe al recibir golpe */
+.boss-hurt-flash {
+    animation: flashHurt 0.3s ease-out, bossShake 0.3s linear;
+}
+
+@keyframes flashHurt {
+    0%, 100% { border-color: #3d2f5c; }
+    50% { border-color: #ff4757; background-color: rgba(255, 71, 87, 0.2); }
+}
+
+@keyframes bossShake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-8px); }
+    40%, 80% { transform: translateX(8px); }
+}
+
+/* --- MENSAJES DE FIN DE JUEGO --- */
+#game-message {
+    font-size: 32px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    padding: 10px;
+    animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.msg-win {
+    color: #2ed573;
+    text-shadow: 0 0 15px rgba(46, 213, 115, 0.6);
+}
+
+.msg-lose {
+    color: #ff4757;
+    text-shadow: 0 0 15px rgba(255, 71, 87, 0.6);
+}
+
+@keyframes popIn {
+    0% { transform: scale(0.8); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
