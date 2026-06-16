@@ -2,69 +2,241 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Creador de Mapas - Guardar Canción</title>
+    <title>Creador de Mapas - Rhythm Battle Arena</title>
+    <link rel="stylesheet" href="style.css">
     <style>
-        body { background: #1a1a1a; color: white; font-family: 'Segoe UI', sans-serif; text-align: center; padding: 20px; }
-        .container { display: flex; justify-content: center; gap: 30px; margin-top: 20px; }
-        #audio-panel { background: #000; padding: 30px; border-radius: 8px; width: 500px; display: flex; flex-direction: column; justify-content: center; align-items: center; border: 2px solid #333; }
-        #editor-panel { background: #2a2a2a; padding: 20px; border-radius: 8px; width: 350px; text-align: left; }
+        .container {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
         
-        .file-select-zone { border: 2px dashed #555; padding: 30px; border-radius: 6px; width: 90%; text-align: center; margin-bottom: 20px; background: #111; cursor: pointer; }
-        .file-select-zone:hover { border-color: #2ed573; }
-        input[type="file"], input[type="text"] { width: 100%; padding: 10px; background: #111; border: 1px solid #555; color: white; border-radius: 4px; box-sizing: border-box; }
-        input[type="text"] { margin-bottom: 15px; background: #333; font-size: 14px; }
-        input[type="file"] { display: none; }
+        #audio-panel {
+            background: #161224;
+            padding: 35px;
+            border-radius: 10px;
+            width: 480px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border: 2px solid rgba(46, 213, 115, 0.3);
+            box-shadow: 0 0 25px rgba(46, 213, 115, 0.08);
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+        
+        #audio-panel:hover {
+            border-color: #2ed573;
+            box-shadow: 0 0 30px rgba(46, 213, 115, 0.15);
+        }
+        
+        #editor-panel {
+            background: #161224;
+            padding: 35px;
+            border-radius: 10px;
+            width: 380px;
+            text-align: left;
+            border: 2px solid rgba(46, 213, 115, 0.3);
+            box-shadow: 0 0 25px rgba(46, 213, 115, 0.08);
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
 
-        .pad-container { display: flex; justify-content: space-between; margin: 15px 0; }
-        .pad { width: 60px; height: 60px; border: 2px solid #555; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 20px; background: #333; transition: all 0.05s ease; user-select: none; }
-        .pad.active-S { background: #ff4757; box-shadow: 0 0 15px #ff4757; color: white; transform: scale(0.95); }
-        .pad.active-D { background: #2ed573; box-shadow: 0 0 15px #2ed573; color: white; transform: scale(0.95); }
-        .pad.active-K { background: #ffa502; box-shadow: 0 0 15px #ffa502; color: white; transform: scale(0.95); }
-        .pad.active-L { background: #1e90ff; box-shadow: 0 0 15px #1e90ff; color: white; transform: scale(0.95); }
+        #editor-panel:hover {
+            border-color: #2ed573;
+            box-shadow: 0 0 30px rgba(46, 213, 115, 0.15);
+        }
+        
+        .file-select-zone {
+            border: 2px dashed rgba(46, 213, 115, 0.4);
+            padding: 35px 20px;
+            border-radius: 8px;
+            width: 100%;
+            text-align: center;
+            margin-bottom: 25px;
+            background: #110e1a;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-sizing: border-box;
+        }
+        
+        .file-select-zone:hover {
+            border-color: #2ed573;
+            background: rgba(46, 213, 115, 0.05);
+            box-shadow: 0 0 15px rgba(46, 213, 115, 0.15);
+        }
+        
+        input[type="file"] {
+            display: none;
+        }
 
-        audio { width: 100%; margin-top: 20px; }
-        textarea { width: 100%; height: 120px; background: #111; color: #2ed573; border: 1px solid #555; border-radius: 4px; font-family: monospace; padding: 10px; box-sizing: border-box; resize: none; font-size: 11px; }
-        button { background: #2ed573; color: black; border: none; padding: 12px 15px; font-weight: bold; border-radius: 4px; cursor: pointer; width: 100%; margin-top: 10px; font-size: 14px; }
-        button:hover { background: #26af5f; }
-        .btn-nav { background: #1e90ff; color: white; margin-bottom: 20px; width: auto; display: inline-block; padding: 10px 20px; }
-        .btn-nav:hover { background: #1173d6; }
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            background: #110e1a;
+            border: 2px solid #3d2f5c;
+            color: white;
+            border-radius: 6px;
+            box-sizing: border-box;
+            margin-bottom: 20px;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        input[type="text"]:focus {
+            border-color: #2ed573;
+            box-shadow: 0 0 10px rgba(46, 213, 115, 0.3);
+        }
+
+        .pad-container {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+        }
+
+        .pad {
+            width: 65px;
+            height: 65px;
+            border: 3px solid #3d2f5c;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 20px;
+            background: #110e1a;
+            color: #a5b1c2;
+            transition: all 0.08s ease;
+            user-select: none;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .pad.active-S { background: #ff4757; border-color: #ff4757; box-shadow: 0 0 20px #ff4757; color: white; transform: scale(0.9); }
+        .pad.active-D { background: #2ed573; border-color: #2ed573; box-shadow: 0 0 20px #2ed573; color: white; transform: scale(0.9); }
+        .pad.active-K { background: #ffa502; border-color: #ffa502; box-shadow: 0 0 20px #ffa502; color: white; transform: scale(0.9); }
+        .pad.active-L { background: #1e90ff; border-color: #1e90ff; box-shadow: 0 0 20px #1e90ff; color: white; transform: scale(0.9); }
+
+        audio {
+            width: 100%;
+            margin-top: 15px;
+            border-radius: 30px;
+            background: #110e1a;
+            box-shadow: 0 0 15px rgba(46, 213, 115, 0.1);
+            outline: none;
+        }
+
+        textarea {
+            width: 100%;
+            height: 120px;
+            background: #110e1a;
+            color: #2ed573;
+            border: 2px solid #3d2f5c;
+            border-radius: 6px;
+            font-family: 'Courier New', Courier, monospace;
+            padding: 12px;
+            box-sizing: border-box;
+            resize: none;
+            font-size: 12px;
+            outline: none;
+            transition: all 0.2s ease;
+            margin-bottom: 15px;
+        }
+
+        textarea:focus {
+            border-color: #2ed573;
+            box-shadow: 0 0 10px rgba(46, 213, 115, 0.2);
+        }
+
+        button {
+            background: #2ed573;
+            color: black;
+            border: none;
+            padding: 12px 15px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            transition: all 0.2s ease;
+        }
+
+        button:hover {
+            background: #5ed98f;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(46, 213, 115, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .btn-danger {
+            background: #ff4757;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #ff6b7b;
+            box-shadow: 0 6px 15px rgba(255, 71, 87, 0.4);
+        }
+
+        #save-btn {
+            background: #2ed573;
+            color: black;
+            margin-top: 25px;
+            font-size: 16px;
+        }
+
+        #save-btn:hover {
+            background: #5ed98f;
+            box-shadow: 0 6px 15px rgba(46, 213, 115, 0.4);
+        }
     </style>
 </head>
 <body>
 
-    <button class="btn-nav" onclick="window.location.href='menu.html'">⬅️ Volver al Menú Principal</button>
-    <h1>🎙️ Creador de Niveles</h1>
-    <p>Selecciona una canción en MP3, ponle un nombre, dale a Play y presiona las teclas al ritmo.</p>
+    <div class="menu-wrapper">
+        <a href="menu.html" class="nav-back" style="margin-top: 20px; display: inline-block;">⬅️ Volver al Menú Principal</a>
+        
+        <h1 id="game-title" style="color: #2ed573; text-shadow: 0 0 20px rgba(46, 213, 115, 0.4); margin-top: 25px; font-size: 38px;">🎙️ CREADOR DE NIVELES 🎙️</h1>
+        <div class="welcome-subtitle" style="margin-bottom: 30px;">Selecciona una canción en MP3, ponle un nombre, dale a Play y presiona las teclas al ritmo.</div>
 
-    <div class="container">
-        <div id="audio-panel">
-            <div class="file-select-zone" onclick="document.getElementById('audio-file').click()">
-                <p id="file-label">🎵 Haz clic para seleccionar tu canción (.mp3)</p>
-                <input type="file" id="audio-file" accept="audio/*">
+        <div class="container">
+            <div id="audio-panel">
+                <div class="file-select-zone" onclick="document.getElementById('audio-file').click()">
+                    <p id="file-label" style="margin: 0; font-weight: bold; color: #2ed573;">🎵 Haz clic para seleccionar tu canción (.mp3)</p>
+                    <input type="file" id="audio-file" accept="audio/*">
+                </div>
+                
+                <label style="align-self: flex-start; margin-bottom: 8px; color: #a5b1c2; font-size: 14px;">Nombre de la canción en el juego:</label>
+                <input type="text" id="song-name" placeholder="Ej: Mi Canción Favorita">
+
+                <audio id="audio-player" controls></audio>
+                <div style="margin-top: 15px; color: #a5b1c2; font-size: 14px;" id="track-time">Tiempo: 0.00s</div>
+                
+                <button id="save-btn">💾 Guardar Canción en el Juego</button>
             </div>
-            
-            <label style="align-self: flex-start; margin-bottom: 5px; color: #aaa;">Nombre de la canción en el juego:</label>
-            <input type="text" id="song-name" placeholder="Ej: Mi Canción Favorita">
 
-            <audio id="audio-player" controls></audio>
-            <div style="margin-top:10px; color: #aaa;" id="track-time">Tiempo: 0.00s</div>
-            
-            <button id="save-btn" style="background: #1e90ff; color: white; margin-top: 25px; font-size: 16px;">💾 Guardar Canción en el Juego</button>
-        </div>
-
-        <div id="editor-panel">
-            <h3 style="margin-top:0;">Teclas (S, D, K, L)</h3>
-            <div class="pad-container">
-                <div id="pad-S" class="pad">S</div>
-                <div id="pad-D" class="pad">D</div>
-                <div id="pad-K" class="pad">K</div>
-                <div id="pad-L" class="pad">L</div>
+            <div id="editor-panel">
+                <h3 style="margin-top:0; color: #2ed573; text-shadow: 0 0 10px rgba(46, 213, 115, 0.2);">Teclas (S, D, K, L)</h3>
+                <div class="pad-container">
+                    <div id="pad-S" class="pad">S</div>
+                    <div id="pad-D" class="pad">D</div>
+                    <div id="pad-K" class="pad">K</div>
+                    <div id="pad-L" class="pad">L</div>
+                </div>
+                <p style="color: #a5b1c2;">Notas grabadas: <strong id="note-count" style="color: #2ed573; font-size: 18px; text-shadow: 0 0 10px rgba(46, 213, 115, 0.3);">0</strong></p>
+                <textarea id="json-output" readonly placeholder="El código JSON aparecerá aquí automáticamente..."></textarea>
+                <button onclick="clearMap()" class="btn-danger">Reiniciar Mapa</button>
             </div>
-            <p>Notas grabadas: <strong id="note-count" style="color: #2ed573;">0</strong></p>
-            <textarea id="json-output" readonly placeholder="El código JSON aparecerá aquí automáticamente..."></textarea>
-            <button onclick="clearMap()" style="background:#ff4757; color:white;">Reiniciar Mapa</button>
         </div>
-    </div>
 
     <script>
         const audioInput = document.getElementById('audio-file');
@@ -170,5 +342,6 @@
             alert(`¡Canción "${title}" guardada con éxito! Ya puedes volver al juego a probarla.`);
         });
     </script>
+    </div>
 </body>
 </html>

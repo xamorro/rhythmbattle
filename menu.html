@@ -19,10 +19,10 @@
             font-size: 18px;
         }
 
-        /* Contenedor vertical de opciones de juego */
+        /* Contenedor de opciones de juego en cuadrícula 2x2 */
         .modes-container {
-            display: flex;
-            flex-direction: column;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
             gap: 25px;
         }
 
@@ -34,17 +34,18 @@
             padding: 25px;
             text-align: left;
             display: flex;
+            flex-direction: column;
             justify-content: space-between;
-            align-items: center;
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
+            box-sizing: border-box;
+            height: 250px;
         }
 
         /* Sección de textos descriptivos */
         .mode-info {
-            flex-grow: 1;
-            padding-right: 30px;
+            width: 100%;
         }
 
         .mode-title {
@@ -58,17 +59,17 @@
         }
 
         .mode-description {
-            margin: 0;
+            margin: 0 0 15px 0;
             color: #a5b1c2;
-            font-size: 15px;
-            line-height: 1.5;
+            font-size: 14px;
+            line-height: 1.4;
         }
 
         /* Botones de acción universales */
         .mode-btn {
             border: none;
-            padding: 14px 28px;
-            font-size: 16px;
+            padding: 12px 20px;
+            font-size: 15px;
             font-weight: bold;
             border-radius: 6px;
             cursor: pointer;
@@ -76,9 +77,11 @@
             text-decoration: none;
             text-transform: uppercase;
             text-align: center;
-            min-width: 180px;
+            width: 100%;
+            box-sizing: border-box;
             box-shadow: 0 4px 10px rgba(0,0,0,0.3);
             transition: all 0.2s ease;
+            margin-top: auto;
         }
 
         /* --- Variaciones visuales y de color por modo --- */
@@ -101,12 +104,16 @@
         .btn-creacion { background: #2ed573; color: black; }
         .btn-creacion:hover { background: #5ed98f; transform: translateY(-2px); box-shadow: 0 6px 15px rgba(46, 213, 115, 0.4); }
 
+        /* 4. MODO MUSICOTE (Cian Neón) */
+        .mode-card.musicote { border-color: rgba(0, 210, 211, 0.4); }
+        .mode-card.musicote:hover { border-color: #00d2d3; box-shadow: 0 0 20px rgba(0, 210, 211, 0.2); }
+        .btn-musicote { background: #00d2d3; color: black; }
+        .btn-musicote:hover { background: #00e8e9; transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0, 210, 211, 0.4); }
+
         /* Adaptación móvil o pantallas compactas */
-        @media (max-width: 680px) {
-            .mode-card { flex-direction: column; text-align: center; gap: 20px; }
-            .mode-info { padding-right: 0; }
-            .mode-title { justify-content: center; }
-            .mode-btn { width: 100%; }
+        @media (max-width: 768px) {
+            .modes-container { grid-template-columns: 1fr; }
+            .mode-card { height: auto; min-height: 250px; }
         }
     </style>
 </head>
@@ -122,7 +129,7 @@
                 <div class="mode-info">
                     <h2 class="mode-title" style="color: #ff4757;">🛡️ Modo Campaña</h2>
                     <p class="mode-description">
-                        Enfréntate al temible <strong>Rey Ritmo</strong> en un duelo clásico de llamada y respuesta con 3 vidas. Memoriza sus composiciones y devuélvele el combo perfecto para dañar su salud. ¡Completa 10 series limpias para ganar!
+                        Enfréntate al temible <strong>Rey Ritmo</strong> en un duelo clásico de llamada y respuesta con 3 vidas. Memoriza sus combos y devuélvele la secuencia perfecta.
                     </p>
                 </div>
                 <a href="seleccion_boss.html" class="mode-btn btn-campana">Iniciar Duelo</a>
@@ -132,7 +139,7 @@
                 <div class="mode-info">
                     <h2 class="mode-title" style="color: #ffa502;">🏆 Modo Highscore</h2>
                     <p class="mode-description">
-                        Una corriente infinita e ininterrumpida de notas aleatorias a toda velocidad en completo silencio. El Rey Ritmo no se detendrá y tú solo posees <strong>1 sola vida (❤️)</strong>. ¿Qué puntuación máxima lograrás registrar?
+                        Una corriente infinita de notas aleatorias a toda velocidad. Solo posees <strong>1 sola vida (❤️)</strong>. ¿Qué puntuación registrarás en el ranking online?
                     </p>
                 </div>
                 <a href="highscore.html" class="mode-btn btn-highscore">Romper Récord</a>
@@ -142,10 +149,20 @@
                 <div class="mode-info">
                     <h2 class="mode-title" style="color: #2ed573;">🎙️ Modo Creación</h2>
                     <p class="mode-description">
-                        Conviértete en el director musical de la arena. Carga tus propias canciones locales en formato MP3, ponles nombre a tus mapas de ritmo y registra las combinaciones de notas en vivo usando tus teclas físicas (`S`, `D`, `K`, `L`).
+                        Carga tus canciones locales en MP3, ponles nombre y graba tus propias notas en vivo pulsando las teclas físico-rítmicas (`S`, `D`, `K`, `L`).
                     </p>
                 </div>
                 <a href="editor_local.html" class="mode-btn btn-creacion">Abrir Editor</a>
+            </div>
+
+            <div class="mode-card musicote">
+                <div class="mode-info">
+                    <h2 class="mode-title" style="color: #00d2d3;">🎵 Modo Musicote</h2>
+                    <p class="mode-description">
+                        Juega los niveles creados por la comunidad o creados por ti. Selecciona el mapa de notas, asócialo con su archivo MP3 local y ¡a jugar!
+                    </p>
+                </div>
+                <a href="musicote.html" class="mode-btn btn-musicote">Jugar Canciones</a>
             </div>
 
         </div>
