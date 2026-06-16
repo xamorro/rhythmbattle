@@ -37,16 +37,21 @@
         </div>
 
         <div class="ui-box">
-            <h3 id="score-title">⭐ Notas Acertadas</h3>
+            <h3 id="score-title">🏆 Mejor Récord</h3>
             <div id="combo-counter" style="font-size: 24px; font-weight: bold; color: #ffa502;">0</div>
         </div>
     </div>
 
     <div id="main-layout" style="display: flex; justify-content: center; align-items: flex-start;">
         <div id="game-area">
+            <div id="save-score-container" style="display: none;">
+                <input type="text" id="player-name-input" placeholder="Ingresa tu Nombre" maxlength="12">
+                <button id="save-score-btn">💾 Guardar Puntuación</button>
+            </div>
             <button id="start-btn" style="background: #ffa502; color: black;">¡Empezar Batalla!</button>
             
             <div id="game-container" style="border-color: #ffa502; box-shadow: 0 0 30px rgba(255, 165, 2, 0.2);">
+                <div id="highscore-current-badge">NOTAS: 0</div>
                 <div id="lane-S" class="lane"></div>
                 <div id="lane-D" class="lane"></div>
                 <div id="lane-K" class="lane"></div>
@@ -76,6 +81,9 @@
     <!-- Firebase Realtime Database -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     
+    <!-- Botón flotante para mutear/reproducir música de fondo -->
+    <button id="mute-music-btn" class="mute-music-btn">🎵</button>
+
     <!-- Lógica del Modo Highscore -->
     <script src="highscore.js"></script>
 </body>

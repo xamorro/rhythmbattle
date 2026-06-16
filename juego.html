@@ -46,6 +46,7 @@
     <div id="main-layout">
         <div id="game-area">
             <button id="start-btn">¡Empezar Batalla!</button>
+            <button id="next-boss-btn" style="display: none;">Siguiente Jefe</button>
             
             <div id="game-container">
                 <div id="lane-S" class="lane"></div>
@@ -61,9 +62,12 @@
                 <div class="key-indicator" style="left:75%;">L</div>
             </div>
             
-            <a href="menu.html" class="nav-back">⬅️ Volver al Menú Principal</a>
+            <a href="seleccion_boss.html" class="nav-back">⬅️ Volver a Selección de Jefe</a>
         </div>
     </div>
+
+    <!-- Botón flotante para mutear/reproducir música de fondo -->
+    <button id="mute-music-btn" class="mute-music-btn campana-theme">🎵</button>
 
     <script src="juego.js"></script>
 </body>

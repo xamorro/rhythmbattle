@@ -71,10 +71,29 @@ body {
 .key-indicator { position: absolute; bottom: 10px; width: 25%; font-weight: bold; font-size: 20px; color: #4e4376; }
 
 #start-btn {
-    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    position: absolute; top: 52%; left: 50%; transform: translate(-50%, -50%);
     z-index: 10; background: #ff4757; border: none; padding: 15px 30px;
     font-size: 18px; font-weight: bold; border-radius: 5px; cursor: pointer; color: white;
     box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    transition: all 0.2s;
+}
+
+#start-btn:hover {
+    transform: translate(-50%, -50%) scale(1.05);
+}
+
+#next-boss-btn {
+    position: absolute; top: 36%; left: 50%; transform: translate(-50%, -50%);
+    z-index: 10; background: #2ed573; border: none; padding: 15px 30px;
+    font-size: 18px; font-weight: bold; border-radius: 5px; cursor: pointer; color: black;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    transition: all 0.2s;
+    text-transform: uppercase;
+}
+
+#next-boss-btn:hover {
+    background: #5ed98f;
+    transform: translate(-50%, -50%) scale(1.05);
 }
 
 @keyframes flashGreen { 0% { background: rgba(46, 213, 115, 0.5); } 100% { background: rgba(46, 213, 115, 0); } }
@@ -253,13 +272,16 @@ body {
     color: #ffd27f;
 }
 
-/* Estilo para los inputs de guardado */
 #save-score-container {
+    position: absolute;
+    top: 28%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 10px;
-    margin-top: 20px;
 }
 
 #player-name-input {
@@ -306,5 +328,248 @@ body {
     color: #aaa;
     cursor: not-allowed;
     transform: none;
+    box-shadow: none;
+}
+
+/* --- PANTALLA DE SELECCIÓN DE JEFES --- */
+.boss-selection-wrapper {
+    max-width: 700px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+.boss-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px 30px;
+    margin-top: 40px;
+}
+
+.boss-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    text-decoration: none;
+}
+
+.boss-circle {
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    background: #161224;
+    border: 3px solid #3d2f5c;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    overflow: hidden; /* Clips the image into a circle */
+}
+
+.boss-circle .emoji {
+    font-size: 48px;
+    transition: transform 0.3s ease;
+}
+
+.boss-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s / 0.3s ease; /* smooth hover transitions */
+    transition-property: transform;
+}
+
+.boss-card.unlocked:hover .boss-img,
+.boss-card.current:hover .boss-img {
+    transform: scale(1.1);
+}
+
+.boss-label {
+    margin-top: 12px;
+    font-weight: bold;
+    font-size: 15px;
+    color: #a5b1c2;
+    transition: color 0.3s ease, text-shadow 0.3s ease;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Estado: DESBLOQUEADO (Ya superado) */
+.boss-card.unlocked .boss-circle {
+    border-color: #2ed573;
+    box-shadow: 0 0 15px rgba(46, 213, 115, 0.15);
+}
+
+.boss-card.unlocked:hover .boss-circle {
+    transform: scale(1.1);
+    box-shadow: 0 0 25px rgba(46, 213, 115, 0.4);
+    border-color: #2ed573;
+}
+
+.boss-card.unlocked:hover .emoji {
+    transform: scale(1.15) rotate(5deg);
+}
+
+.boss-card.unlocked:hover .boss-label {
+    color: #2ed573;
+    text-shadow: 0 0 10px rgba(46, 213, 115, 0.4);
+}
+
+/* Estado: ACTUALMENTE EN BATALLA (El que toca jugar) */
+.boss-card.current .boss-circle {
+    border-color: #ff4757;
+    box-shadow: 0 0 20px rgba(255, 71, 87, 0.3);
+}
+
+.boss-card.current:hover .boss-circle {
+    transform: scale(1.1);
+    box-shadow: 0 0 30px rgba(255, 71, 87, 0.6);
+    border-color: #ff4757;
+}
+
+.boss-card.current:hover .boss-label {
+    color: #ff4757;
+    text-shadow: 0 0 10px rgba(255, 71, 87, 0.4);
+}
+
+/* Estado: BLOQUEADO (Por nivel) */
+.boss-card.locked {
+    pointer-events: none;
+}
+
+.boss-card.locked .boss-circle {
+    background: #0f0d18;
+    border-color: #221c35;
+    opacity: 0.4;
+    filter: grayscale(100%);
+    cursor: not-allowed;
+}
+
+/* Estado: PRÓXIMAMENTE (Filas 2 y 3) */
+.boss-card.coming-soon {
+    pointer-events: none;
+}
+
+.boss-card.coming-soon .boss-circle {
+    background: #0d0a14;
+    border: 3px dashed #221c35;
+    opacity: 0.3;
+    filter: grayscale(100%);
+    box-shadow: none;
+}
+
+.boss-card.coming-soon .boss-label {
+    color: #555;
+}
+
+/* Insignias de Candado y Check */
+.status-badge {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #110e1a;
+    border: 2px solid #555;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+    z-index: 2;
+}
+
+.boss-card.unlocked .status-badge {
+    border-color: #2ed573;
+    background: #0d281a;
+}
+
+.boss-card.current .status-badge {
+    border-color: #ff4757;
+    background: #2b0c13;
+}
+
+.boss-card.locked .status-badge,
+.boss-card.coming-soon .status-badge {
+    border-color: #444;
+    background: #1a1a1a;
+}
+
+/* Botón de reset */
+.btn-reset-prog {
+    background: none;
+    border: 1px solid rgba(255, 71, 87, 0.4);
+    color: rgba(255, 71, 87, 0.7);
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: bold;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 40px;
+    transition: all 0.2s;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.btn-reset-prog:hover {
+    background: rgba(255, 71, 87, 0.1);
+    color: #ff4757;
+    border-color: #ff4757;
+}
+
+/* --- PLACA DE NOTAS ACTUALES (MODO HIGHSCORE) --- */
+#highscore-current-badge {
+    position: absolute;
+    top: 12px;
+    left: 15px;
+    color: rgba(255, 165, 2, 0.85);
+    font-size: 13px;
+    font-weight: bold;
+    z-index: 5;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    pointer-events: none;
+    text-shadow: 0 0 5px rgba(255, 165, 2, 0.4);
+}
+
+/* --- BOTÓN DE MUTEAR MÚSICA FLOTANTE --- */
+.mute-music-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 100;
+    background: #ffa502;
+    color: black;
+    border: none;
+    padding: 10px;
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    transition: all 0.2s ease;
+}
+
+.mute-music-btn:hover {
+    transform: scale(1.1);
+}
+
+.mute-music-btn.campana-theme {
+    background: #ff4757;
+    color: white;
+}
+
+.mute-music-btn.muted {
+    background: #555 !important;
+    color: #aaa !important;
     box-shadow: none;
 }

@@ -21,6 +21,8 @@ const bossDialogue = document.getElementById('boss-dialogue');
 const comboCounterEle = document.getElementById('combo-counter');
 const bossActiveUi = document.getElementById('boss-active-ui');
 const gameMessage = document.getElementById('game-message');
+const highscoreCurrentBadge = document.getElementById('highscore-current-badge');
+const muteMusicBtn = document.getElementById('mute-music-btn');
 
 // --- VARIABLES DEL ESTADO DE JUEGO ---
 let gameInterval;
@@ -36,6 +38,17 @@ let highscoreSpawnTimeout = null;   // Manejador del flujo continuo
 
 const keys = ['S', 'D', 'K', 'L'];
 
+// --- VARIABLES DE MÚSICA DE FONDO ---
+let isMusicMuted = localStorage.getItem('game_music_muted') === 'true';
+let musicSequencerInterval = null;
+let currentMusicStep = 0;
+
+// Notas de bajo procedurales (A2, A2, C3, D3, A2, A2, G2, E2)
+const bassNotes = [
+    110.00, 110.00, 130.81, 146.83,
+    110.00, 110.00, 98.00, 82.41
+];
+
 // --- SISTEMA DE SONIDO MUSICAL (WEB AUDIO API) ---
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
@@ -46,7 +59,7 @@ const toneConfig = {
     'L': 523.25  
 };
 
-// Función para reproducir sonidos tipo sintetizador en tiempo real
+// Función para reproducir sonidos tipo sintetizador en tiempo real (efectos)
 function playSound(key, type = 'square', duration = 0.1) {
     if (audioCtx.state === 'suspended') {
         audioCtx.resume();
@@ -68,6 +81,51 @@ function playSound(key, type = 'square', duration = 0.1) {
     osc.stop(audioCtx.currentTime + duration);
 }
 
+// --- SECUENCIADOR DE MÚSICA DE FONDO ---
+function playMusicStep() {
+    if (isMusicMuted || !isGameRunning) return;
+    const freq = bassNotes[currentMusicStep % bassNotes.length];
+    
+    try {
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+        
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        
+        // Volumen bajo para ser música de fondo de ambiente
+        gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.35);
+        
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.38);
+    } catch (e) {
+        console.error("Audio error in background music sequencer:", e);
+    }
+    
+    currentMusicStep++;
+}
+
+function startMusicLoop() {
+    if (musicSequencerInterval) clearInterval(musicSequencerInterval);
+    currentMusicStep = 0;
+    musicSequencerInterval = setInterval(playMusicStep, 400); // ~150 BPM
+}
+
+function stopMusicLoop() {
+    if (musicSequencerInterval) {
+        clearInterval(musicSequencerInterval);
+        musicSequencerInterval = null;
+    }
+}
+
 // --- CRONÓMETRO INTERNO ---
 function getGameTime() {
     return (performance.now() - gameStartTime) / 1000;
@@ -76,6 +134,9 @@ function getGameTime() {
 // --- BOTÓN INICIAR BATALLA ---
 startBtn.addEventListener('click', () => {
     startBtn.style.display = 'none';
+    
+    const saveContainer = document.getElementById('save-score-container');
+    if (saveContainer) saveContainer.style.display = 'none';
     
     // Iniciar reloj interno
     gameStartTime = performance.now();
@@ -102,22 +163,50 @@ startBtn.addEventListener('click', () => {
     
     // Desencadenar el primer flujo de ataque
     launchContinuousHighscoreNote();
+
+    // Activar música de fondo
+    startMusicLoop();
 });
 
 // --- GENERACIÓN CONTINUA PARA MODO HIGHSCORE ---
 function launchContinuousHighscoreNote() {
     if (!isGameRunning || playerLives <= 0) return;
 
-    let randomKey = keys[Math.floor(Math.random() * keys.length)];
-    
-    activeAttackNotes.push({
-        time: getGameTime() + 1.8, // Tiempo de anticipación de caída
-        key: randomKey,
-        id: `note-${Date.now()}-${Math.random()}`
+    // Determinar cuántas notas generar simultáneamente según la puntuación actual
+    let numNotes = 1;
+    if (completedCombos >= 70) {
+        let rand = Math.random();
+        if (rand < 0.10) numNotes = 3;
+        else if (rand < 0.45) numNotes = 2;
+    } else if (completedCombos >= 40) {
+        let rand = Math.random();
+        if (rand < 0.05) numNotes = 3;
+        else if (rand < 0.30) numNotes = 2;
+    } else if (completedCombos >= 20) {
+        if (Math.random() < 0.15) numNotes = 2;
+    }
+
+    // Mezclar las teclas disponibles y elegir las primeras numNotes para garantizar carriles únicos
+    let shuffledKeys = [...keys].sort(() => Math.random() - 0.5);
+    let selectedKeys = shuffledKeys.slice(0, numNotes);
+
+    const noteTime = getGameTime() + 1.8; // Tiempo de anticipación de caída
+    const nowId = Date.now();
+
+    selectedKeys.forEach((key, index) => {
+        activeAttackNotes.push({
+            time: noteTime,
+            key: key,
+            id: `note-${nowId}-${index}-${Math.random()}`
+        });
     });
 
     // Intervalo de caída dinámico. Se vuelve más rápido cuantas más notas aciertas
     let spawnRate = Math.max(220, 750 - (completedCombos * 6)); 
+
+    // Añadir margen de tiempo extra para permitir responder físicamente a los acordes
+    if (numNotes === 2) spawnRate += 100;
+    if (numNotes === 3) spawnRate += 200;
 
     highscoreSpawnTimeout = setTimeout(() => {
         launchContinuousHighscoreNote();
@@ -240,13 +329,17 @@ function checkHit(key) {
 // --- ACTUALIZACIONES DE INTERFAZ (UI) ---
 function updateUI() {
     heartsEle.innerText = playerLives > 0 ? "❤️" : "💀";
-    comboCounterEle.innerText = `${completedCombos} (Récord: ${highscore})`;
+    comboCounterEle.innerText = highscore; // El bloque superior derecho muestra el récord
+    if (highscoreCurrentBadge) {
+        highscoreCurrentBadge.innerText = `NOTAS: ${completedCombos}`; // El cartel en la pista muestra tus notas del intento
+    }
 }
 
 function endGame() {
     isGameRunning = false;
     clearInterval(gameInterval);
     clearTimeout(highscoreSpawnTimeout);
+    stopMusicLoop();
     
     document.querySelectorAll('.note').forEach(n => n.remove());
 
@@ -255,42 +348,45 @@ function endGame() {
 
     gameMessage.className = 'msg-lose';
     
-    // Crear la estructura de derrota con el formulario de guardado
+    // Crear la estructura de derrota con solamente las notas acertadas
     gameMessage.innerHTML = `
         GAME OVER
         <div style="font-size: 18px; color: #fff; margin-top: 10px;">
             Acertaste: <strong style="color: #ffa502;">${completedCombos}</strong> notas.
         </div>
-        <div style="font-size: 14px; color: #a5b1c2; margin-top: 5px;">
-            Tu mejor récord histórico: ${highscore}
-        </div>
-        
-        <div id="save-score-container">
-            <input type="text" id="player-name-input" placeholder="Ingresa tu Nombre" maxlength="12">
-            <button id="save-score-btn">💾 Guardar Puntuación</button>
-        </div>
     `;
 
-    // Vincular el evento del botón de guardar puntuación
-    const saveBtn = document.getElementById('save-score-btn');
-    const nameInput = document.getElementById('player-name-input');
-    
-    if (saveBtn && nameInput) {
-        saveBtn.addEventListener('click', () => {
-            const name = nameInput.value.trim();
-            if (!name) {
-                alert("Por favor, ingresa un nombre válido.");
-                return;
-            }
-            saveScoreToFirebase(name);
-        });
+    // Mostrar el contenedor de guardar puntuación estático
+    const saveContainer = document.getElementById('save-score-container');
+    if (saveContainer) {
+        saveContainer.style.display = 'flex';
+        // Restaurar contenido limpio del formulario
+        saveContainer.innerHTML = `
+            <input type="text" id="player-name-input" placeholder="Ingresa tu Nombre" maxlength="12">
+            <button id="save-score-btn">💾 Guardar Puntuación</button>
+        `;
+
+        // Vincular el evento del botón de guardar puntuación
+        const saveBtn = document.getElementById('save-score-btn');
+        const nameInput = document.getElementById('player-name-input');
         
-        // Permitir guardar presionando Enter en el input
-        nameInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                saveBtn.click();
-            }
-        });
+        if (saveBtn && nameInput) {
+            saveBtn.addEventListener('click', () => {
+                const name = nameInput.value.trim();
+                if (!name) {
+                    alert("Por favor, ingresa un nombre válido.");
+                    return;
+                }
+                saveScoreToFirebase(name);
+            });
+            
+            // Permitir guardar presionando Enter en el input
+            nameInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    saveBtn.click();
+                }
+            });
+        }
     }
     
     startBtn.innerText = "Reintentar Desafío";
@@ -400,5 +496,30 @@ function escapeHTML(str) {
     );
 }
 
-// Inicializar la escucha al cargar la página
+// --- CONTROL DE MÚSICA DE FONDO MUTE ---
+function updateMuteButtonUI() {
+    if (!muteMusicBtn) return;
+    if (isMusicMuted) {
+        muteMusicBtn.classList.add('muted');
+        muteMusicBtn.innerText = '🔇';
+    } else {
+        muteMusicBtn.classList.remove('muted');
+        muteMusicBtn.innerText = '🎵';
+    }
+}
+
+if (muteMusicBtn) {
+    muteMusicBtn.addEventListener('click', () => {
+        isMusicMuted = !isMusicMuted;
+        localStorage.setItem('game_music_muted', isMusicMuted);
+        updateMuteButtonUI();
+        
+        if (!isMusicMuted && isGameRunning && audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+    });
+}
+
+// Inicializar el botón de mute y la escucha de Firebase
+updateMuteButtonUI();
 setupHighscoresListener();

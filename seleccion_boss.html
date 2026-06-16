@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Rhythm Battle Arena - Selección de Jefe</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .nav-back {
+            display: inline-block;
+            margin-top: 25px;
+            color: #a5b1c2;
+            text-decoration: none;
+            font-size: 15px;
+            transition: color 0.2s;
+        }
+        .nav-back:hover { color: #ff4757; }
+    </style>
+</head>
+<body>
+
+    <div class="boss-selection-wrapper">
+        <h1 style="font-size: 38px; margin-top: 30px;">⚔️ SELECCIÓN DE JEFE ⚔️</h1>
+        <p style="color: #a5b1c2; font-style: italic; margin-bottom: 30px;">Derrota a cada jefe para desbloquear el siguiente reto musical</p>
+
+        <div class="boss-grid" id="boss-grid">
+            <!-- Boss 1 -->
+            <a id="boss-1-link" href="#" class="boss-card">
+                <div class="boss-circle">
+                    <img src="fotos/boss_1.png" alt="Rey Ritmo" class="boss-img">
+                    <div class="status-badge" id="boss-1-badge"></div>
+                </div>
+                <div class="boss-label">1. Rey Ritmo</div>
+            </a>
+
+            <!-- Boss 2 -->
+            <a id="boss-2-link" href="#" class="boss-card">
+                <div class="boss-circle">
+                    <img src="fotos/boss_2.png" alt="Reina Melodía" class="boss-img">
+                    <div class="status-badge" id="boss-2-badge"></div>
+                </div>
+                <div class="boss-label">2. Reina Melodía</div>
+            </a>
+
+            <!-- Boss 3 -->
+            <a id="boss-3-link" href="#" class="boss-card">
+                <div class="boss-circle">
+                    <img src="fotos/boss_3.png" alt="Sintetizador Supremo" class="boss-img">
+                    <div class="status-badge" id="boss-3-badge"></div>
+                </div>
+                <div class="boss-label">3. Sintetizador Supremo</div>
+            </a>
+
+            <!-- Bosses 4 a 9 (Próximamente / Bloqueados permanentes) -->
+            <div class="boss-card coming-soon">
+                <div class="boss-circle">
+                    <span class="emoji">🔒</span>
+                    <div class="status-badge">🔒</div>
+                </div>
+                <div class="boss-label">Próximamente</div>
+            </div>
+
+            <div class="boss-card coming-soon">
+                <div class="boss-circle">
+                    <span class="emoji">🔒</span>
+                    <div class="status-badge">🔒</div>
+                </div>
+                <div class="boss-label">Próximamente</div>
+            </div>
+
+            <div class="boss-card coming-soon">
+                <div class="boss-circle">
+                    <span class="emoji">🔒</span>
+                    <div class="status-badge">🔒</div>
+                </div>
+                <div class="boss-label">Próximamente</div>
+            </div>
+
+            <div class="boss-card coming-soon">
+                <div class="boss-circle">
+                    <span class="emoji">🔒</span>
+                    <div class="status-badge">🔒</div>
+                </div>
+                <div class="boss-label">Próximamente</div>
+            </div>
+
+            <div class="boss-card coming-soon">
+                <div class="boss-circle">
+                    <span class="emoji">🔒</span>
+                    <div class="status-badge">🔒</div>
+                </div>
+                <div class="boss-label">Próximamente</div>
+            </div>
+
+            <div class="boss-card coming-soon">
+                <div class="boss-circle">
+                    <span class="emoji">🔒</span>
+                    <div class="status-badge">🔒</div>
+                </div>
+                <div class="boss-label">Próximamente</div>
+            </div>
+        </div>
+
+        <div style="margin-top: 20px;">
+            <button class="btn-reset-prog" onclick="resetProgress()">🔄 Reiniciar Progreso</button>
+        </div>
+
+        <a href="menu.html" class="nav-back">⬅️ Volver al Menú Principal</a>
+    </div>
+
+    <script>
+        // Lógica de desbloqueo y estado de los bosses
+        const boss2Unlocked = localStorage.getItem('boss_2_unlocked') === 'true';
+        const boss3Unlocked = localStorage.getItem('boss_3_unlocked') === 'true';
+        const boss4Unlocked = localStorage.getItem('boss_4_unlocked') === 'true';
+
+        // Configuración Boss 1
+        const card1 = document.getElementById('boss-1-link');
+        const badge1 = document.getElementById('boss-1-badge');
+        if (boss2Unlocked) {
+            card1.className = "boss-card unlocked";
+            badge1.innerText = "✅";
+        } else {
+            card1.className = "boss-card current";
+            badge1.innerText = "🎯";
+        }
+        card1.href = "juego.html?boss=1";
+
+        // Configuración Boss 2
+        const card2 = document.getElementById('boss-2-link');
+        const badge2 = document.getElementById('boss-2-badge');
+        if (boss2Unlocked) {
+            if (boss3Unlocked) {
+                card2.className = "boss-card unlocked";
+                badge2.innerText = "✅";
+            } else {
+                card2.className = "boss-card current";
+                badge2.innerText = "🎯";
+            }
+            card2.href = "juego.html?boss=2";
+        } else {
+            card2.className = "boss-card locked";
+            badge2.innerText = "🔒";
+            card2.removeAttribute('href');
+        }
+
+        // Configuración Boss 3
+        const card3 = document.getElementById('boss-3-link');
+        const badge3 = document.getElementById('boss-3-badge');
+        if (boss3Unlocked) {
+            if (boss4Unlocked) {
+                card3.className = "boss-card unlocked";
+                badge3.innerText = "✅";
+            } else {
+                card3.className = "boss-card current";
+                badge3.innerText = "🎯";
+            }
+            card3.href = "juego.html?boss=3";
+        } else {
+            card3.className = "boss-card locked";
+            badge3.innerText = "🔒";
+            card3.removeAttribute('href');
+        }
+
+        // Función para reiniciar el progreso de desbloqueos
+        function resetProgress() {
+            if (confirm("¿Estás seguro de que quieres reiniciar tu progreso en la campaña? Esto bloqueará de nuevo a los jefes 2 y 3.")) {
+                localStorage.removeItem('boss_2_unlocked');
+                localStorage.removeItem('boss_3_unlocked');
+                localStorage.removeItem('boss_4_unlocked');
+                window.location.reload();
+            }
+        }
+    </script>
+</body>
+</html>
