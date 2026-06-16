@@ -155,3 +155,156 @@ body {
     0% { transform: scale(0.8); opacity: 0; }
     100% { transform: scale(1); opacity: 1; }
 }
+
+/* --- ZONA DE HIGHSCORES (MODO SUPERVIVENCIA) --- */
+#highscore-panel {
+    width: 200px;
+    height: 600px;
+    background: #161224;
+    border: 4px solid #ffa502;
+    border-radius: 10px;
+    margin-left: 20px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    padding: 15px 10px;
+    box-shadow: 0 0 25px rgba(255, 165, 2, 0.15);
+}
+
+#highscore-panel h3 {
+    margin: 0 0 15px 0;
+    color: #ffa502;
+    font-size: 16px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    text-shadow: 0 0 10px rgba(255, 165, 2, 0.4);
+    font-weight: bold;
+}
+
+#highscore-list {
+    flex-grow: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-right: 2px;
+}
+
+/* Scrollbar personalizado para la lista de highscores */
+#highscore-list::-webkit-scrollbar {
+    width: 4px;
+}
+#highscore-list::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.02);
+}
+#highscore-list::-webkit-scrollbar-thumb {
+    background: rgba(255, 165, 2, 0.3);
+    border-radius: 2px;
+}
+#highscore-list::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 165, 2, 0.5);
+}
+
+.highscore-entry {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 165, 2, 0.1);
+    border-radius: 5px;
+    padding: 8px 10px;
+    font-size: 13px;
+    transition: all 0.2s ease;
+}
+
+.highscore-entry:hover {
+    background: rgba(255, 165, 2, 0.08);
+    border-color: rgba(255, 165, 2, 0.3);
+    transform: translateX(2px);
+}
+
+.highscore-entry.loading {
+    justify-content: center;
+    color: #a5b1c2;
+    font-style: italic;
+    border: none;
+    background: none;
+}
+
+.highscore-entry .rank {
+    font-weight: bold;
+    color: #ffa502;
+    margin-right: 6px;
+    font-size: 12px;
+}
+
+.highscore-entry .name {
+    flex-grow: 1;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #e2e8f0;
+    padding-right: 5px;
+}
+
+.highscore-entry .score {
+    font-weight: bold;
+    color: #ffd27f;
+}
+
+/* Estilo para los inputs de guardado */
+#save-score-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+#player-name-input {
+    padding: 10px;
+    font-size: 14px;
+    border-radius: 6px;
+    border: 2px solid #3d2f5c;
+    background: #110e1a;
+    color: white;
+    text-align: center;
+    width: 200px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+#player-name-input:focus {
+    border-color: #ffa502;
+    box-shadow: 0 0 10px rgba(255, 165, 2, 0.3);
+}
+
+#save-score-btn {
+    background: #ffa502;
+    color: black;
+    border: none;
+    padding: 10px 20px;
+    font-weight: bold;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    width: 224px;
+    text-transform: uppercase;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    transition: all 0.2s ease;
+}
+
+#save-score-btn:hover {
+    background: #ffb93a;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(255, 165, 2, 0.4);
+}
+
+#save-score-btn:disabled {
+    background: #555;
+    color: #aaa;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}

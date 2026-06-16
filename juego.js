@@ -7,30 +7,21 @@ const comboCounterEle = document.getElementById('combo-counter');
 const bossActiveUi = document.getElementById('boss-active-ui');
 const gameMessage = document.getElementById('game-message');
 
-// --- DETECCIÓN DE MODO DE JUEGO ---
-const urlParams = new URLSearchParams(window.location.search);
-const isHighscoreMode = urlParams.get('mode') === 'highscore';
-
 // --- VARIABLES DEL ESTADO DE JUEGO ---
 let gameInterval;
 let gameStartTime = 0;
 let isGameRunning = false;
 
-// Configuración adaptativa según el modo
-let playerLives = isHighscoreMode ? 1 : 3;
+let playerLives = 3;
 const TOTAL_COMBOS_TO_WIN = 10;
 
-let completedCombos = 0; // En modo Highscore esto contará las notas acertadas
+let completedCombos = 0;
 let activeAttackNotes = [];       // Notas en pantalla actualmente
 let currentComboNotesCount = 0;   // Notas totales del ataque actual
 let notesHitInCurrentCombo = 0;   // Notas defendidas con éxito
 let isBossAttacking = false;
 let failedCurrentCombo = false;   // Bloquea el combo si ya cometiste un fallo
 
-let highscore = parseInt(localStorage.getItem('rhythm_arena_highscore')) || 0;
-let highscoreSpawnTimeout = null;   // Manejador del flujo continuo
-
-// CORRECCIÓN: Definición limpia de las teclas disponibles
 const keys = ['S', 'D', 'K', 'L'];
 
 // Diálogos del jefe
@@ -42,31 +33,9 @@ const bossPhrases = [
     "¡Tempo acelerado activado!"
 ];
 
-// Adaptar interfaz visual antes de empezar según el modo elegido
-if (isHighscoreMode) {
-    const titleElement = document.querySelector('h1');
-    if (titleElement) {
-        titleElement.innerHTML = "🏆 RHYTHM ARENA: HIGHSCORE 🏆";
-        titleElement.style.color = "#ffa502";
-        titleElement.style.textShadow = "0 0 15px rgba(255, 165, 2, 0.6)";
-    }
-    const scoreTitle = document.querySelector('.ui-box:nth-child(3) h3');
-    if (scoreTitle) scoreTitle.innerText = "⭐ Notas Acertadas";
-    
-    const bossName = document.getElementById('boss-name');
-    if (bossName) {
-        bossName.innerText = "😈 Rey Ritmo (Bucle Infinito)";
-        bossName.style.color = "#ffa502";
-    }
-    bossHealthFill.style.background = "#ffa502";
-    comboCounterEle.innerText = `0 (Récord: ${highscore})`;
-    heartsEle.innerText = "❤️";
-}
-
 // --- SISTEMA DE SONIDO MUSICAL (WEB AUDIO API) ---
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-// CORRECCIÓN: Estructura corregida sin saltos de línea ilegales o caracteres corruptos
 const toneConfig = {
     'S': 261.63, 
     'D': 329.63, 
@@ -109,8 +78,8 @@ startBtn.addEventListener('click', () => {
     gameStartTime = performance.now();
     isGameRunning = true;
     
-    // Reiniciar estadísticas según el modo
-    playerLives = isHighscoreMode ? 1 : 3;
+    // Reiniciar estadísticas
+    playerLives = 3;
     completedCombos = 0;
     activeAttackNotes = [];
     isBossAttacking = false;
@@ -125,48 +94,16 @@ startBtn.addEventListener('click', () => {
     gameMessage.innerText = '';
 
     updateUI();
-    
-    if (isHighscoreMode) {
-        bossDialogue.innerText = "¡A ver cuánto aguantas con 1 sola vida!";
-    } else {
-        bossDialogue.innerText = "¡Que empiece el duelo musical!";
-    }
+    bossDialogue.innerText = "¡Que empiece el duelo musical!";
     
     // Ciclo del juego a 60 FPS
     gameInterval = setInterval(updateGame, 1000 / 60);
     
-    // Desencadenar el primer flujo de ataque
-    if (isHighscoreMode) {
-        isBossAttacking = true; // Siempre en combate en modo Highscore
-        launchContinuousHighscoreNote();
-    } else {
-        scheduleNextBossAction();
-    }
+    // Desencadenar el primer ataque de la IA
+    scheduleNextBossAction();
 });
 
-// --- GENERACIÓN CONTINUA PARA MODO HIGHSCORE ---
-function launchContinuousHighscoreNote() {
-    if (!isGameRunning || playerLives <= 0) return;
-
-    // CORRECCIÓN: Cambiado 'keysPool' por el nombre correcto de la variable: 'keys'
-    let randomKey = keys[Math.floor(Math.random() * keys.length)];
-    
-    // En modo Highscore la nota se añade directamente al flujo visual sin reproducir sonido previo
-    activeAttackNotes.push({
-        time: getGameTime() + 1.8, // Tiempo de anticipación de caída en segundos
-        key: randomKey,
-        id: `note-${Date.now()}-${Math.random()}`
-    });
-
-    // Intervalo de caída dinámico. Se vuelve más rápido cuantas más notas aciertas
-    let spawnRate = Math.max(250, 750 - (completedCombos * 8)); 
-
-    highscoreSpawnTimeout = setTimeout(() => {
-        launchContinuousHighscoreNote();
-    }, spawnRate);
-}
-
-// --- INTELIGENCIA ARTIFICIAL DEL ENEMIGO (MODO CAMPAÑA ORIGINAL) ---
+// --- INTELIGENCIA ARTIFICIAL DEL ENEMIGO ---
 function scheduleNextBossAction() {
     if (!isGameRunning || playerLives <= 0 || completedCombos >= TOTAL_COMBOS_TO_WIN) return;
 
@@ -199,12 +136,11 @@ function launchRandomAttack() {
 
     // 1. EL JEFE TOCA SU MELODÍA PRIMERO (FASE DE ESCUCHA)
     for (let i = 0; i < currentComboNotesCount; i++) {
-        // CORRECCIÓN: Cambiado 'keysPool' por 'keys'
         let randomKey = keys[Math.floor(Math.random() * keys.length)];
         
         setTimeout(() => {
             if (isGameRunning && playerLives > 0) {
-                playSound(randomKey, 'sine', 0.25); // Usamos 'sine' suave para el jefe
+                playSound(randomKey, 'sine', 0.25); 
                 
                 const lane = document.getElementById(`lane-${randomKey}`);
                 if (lane) {
@@ -240,7 +176,7 @@ function updateGame() {
         return;
     }
     
-    if (!isHighscoreMode && completedCombos >= TOTAL_COMBOS_TO_WIN) {
+    if (completedCombos >= TOTAL_COMBOS_TO_WIN) {
         isGameRunning = false;
         setTimeout(() => endGame(true), 600);
         return;
@@ -269,10 +205,7 @@ function drawNote(note, timeToHit) {
     }
     
     const targetTop = 540; // Línea de impacto
-    
-    // En modo Highscore la velocidad incrementa progresivamente según las notas acertadas
-    let speedPixels = isHighscoreMode ? (300 + Math.min(200, completedCombos * 2)) : 300;
-    const currentTop = targetTop - (timeToHit * speedPixels);
+    const currentTop = targetTop - (timeToHit * 300);
     noteElement.style.top = `${currentTop}px`;
     
     if (timeToHit < -0.25) { 
@@ -280,10 +213,7 @@ function drawNote(note, timeToHit) {
         activeAttackNotes = activeAttackNotes.filter(n => n.id !== note.id);
         
         processPlayerMiss(note.key);
-        
-        if (!isHighscoreMode) {
-            checkComboEnd();
-        }
+        checkComboEnd();
     }
 }
 
@@ -291,22 +221,15 @@ function drawNote(note, timeToHit) {
 function processPlayerMiss(key) {
     triggerMissEffect(key);
     
-    if (isHighscoreMode) {
+    if (!failedCurrentCombo) {
+        failedCurrentCombo = true;
         playerLives--;
         updateUI();
-    } else {
-        if (!failedCurrentCombo) {
-            failedCurrentCombo = true;
-            playerLives--;
-            updateUI();
-            bossDialogue.innerText = "😈 ¡Demasiado lento para mi ritmo!";
-        }
+        bossDialogue.innerText = "😈 ¡Demasiado lento para mi ritmo!";
     }
 }
 
 function checkComboEnd() {
-    if (isHighscoreMode) return; // El modo Highscore no finaliza por combos estructurales
-
     if (activeAttackNotes.length === 0) {
         if (isBossAttacking) {
             isBossAttacking = false; 
@@ -350,41 +273,17 @@ function checkHit(key) {
     );
     
     if (index !== -1) {
-        // Sonido del jugador ('square')
         playSound(key, 'square', 0.12);
-        
         triggerHitEffect(key);
 
         const noteElement = document.getElementById(activeAttackNotes[index].id);
         if (noteElement) noteElement.remove();
         activeAttackNotes.splice(index, 1);
 
-        if (isHighscoreMode) {
-            completedCombos++;
-            
-            // Actualizar y persistir el récord en localStorage instantáneamente
-            if (completedCombos > highscore) {
-                highscore = completedCombos;
-                localStorage.setItem('rhythm_arena_highscore', highscore);
-            }
-            
-            // Efecto visual: la barra se llena progresivamente cada 25 notas consecutivas
-            let visualProgress = (completedCombos % 25) * 4;
-            bossHealthFill.style.width = `${visualProgress}%`;
-            
-            if (completedCombos % 10 === 0) {
-                bossDialogue.innerText = `👿 ¡Llevas ${completedCombos}! ¿Podrás aguantar la aceleración?`;
-            }
-            updateUI();
-        } else {
-            notesHitInCurrentCombo++;
-            checkComboEnd();
-        }
+        notesHitInCurrentCombo++;
+        checkComboEnd();
     } else {
-        if (isBossAttacking && !isHighscoreMode && !failedCurrentCombo) {
-            processPlayerMiss(key);
-        } else if (isHighscoreMode) {
-            // Penalización por pulsar botones al azar en modo Highscore
+        if (isBossAttacking && !failedCurrentCombo) {
             processPlayerMiss(key);
         }
     }
@@ -392,50 +291,39 @@ function checkHit(key) {
 
 // --- ACTUALIZACIONES DE INTERFAZ (UI) ---
 function updateUI() {
-    if (isHighscoreMode) {
-        heartsEle.innerText = playerLives > 0 ? "❤️" : "💀";
-        comboCounterEle.innerText = `${completedCombos} (Récord: ${highscore})`;
-    } else {
-        heartsEle.innerText = "❤️".repeat(Math.max(0, playerLives)) + "🖤".repeat(Math.max(0, 3 - playerLives));
-        comboCounterEle.innerText = `${completedCombos} / ${TOTAL_COMBOS_TO_WIN}`;
-        
-        let bossHealthPercentage = ((TOTAL_COMBOS_TO_WIN - completedCombos) / TOTAL_COMBOS_TO_WIN) * 100;
-        bossHealthFill.style.width = `${bossHealthPercentage}%`;
+    heartsEle.innerText = "❤️".repeat(Math.max(0, playerLives)) + "🖤".repeat(Math.max(0, 3 - playerLives));
+    comboCounterEle.innerText = `${completedCombos} / ${TOTAL_COMBOS_TO_WIN}`;
+    
+    let bossHealthPercentage = ((TOTAL_COMBOS_TO_WIN - completedCombos) / TOTAL_COMBOS_TO_WIN) * 100;
+    bossHealthFill.style.width = `${bossHealthPercentage}%`;
 
-        if (completedCombos >= 7) {
-            bossHealthFill.style.background = "#ffa502"; 
-        } else if (completedCombos >= 4) {
-            bossHealthFill.style.background = "#ff7f50"; 
-        } else {
-            bossHealthFill.style.background = "#ff4757"; 
-        }
+    if (completedCombos >= 7) {
+        bossHealthFill.style.background = "#ffa502"; 
+    } else if (completedCombos >= 4) {
+        bossHealthFill.style.background = "#ff7f50"; 
+    } else {
+        bossHealthFill.style.background = "#ff4757"; 
     }
 }
 
 function endGame(playerWon) {
     isGameRunning = false;
     clearInterval(gameInterval);
-    clearTimeout(highscoreSpawnTimeout);
     
     document.querySelectorAll('.note').forEach(n => n.remove());
 
     bossActiveUi.style.display = 'none';
     gameMessage.style.display = 'block';
 
-    if (isHighscoreMode) {
-        gameMessage.className = 'msg-lose';
-        gameMessage.innerHTML = `GAME OVER<br><br><span style="font-size: 20px; color: #fff;">Acertaste: <strong style="color: #ffa502;">${completedCombos}</strong> notas.</span><br><span style="font-size: 16px; color: #a5b1c2;">Tu mejor récord histórico: ${highscore}</span>`;
+    if (playerWon) {
+        gameMessage.className = 'msg-win';
+        gameMessage.innerText = '¡HAS GANADO!';
     } else {
-        if (playerWon) {
-            gameMessage.className = 'msg-win';
-            gameMessage.innerText = '¡HAS GANADO!';
-        } else {
-            gameMessage.className = 'msg-lose';
-            gameMessage.innerText = 'GAME OVER';
-        }
+        gameMessage.className = 'msg-lose';
+        gameMessage.innerText = 'GAME OVER';
     }
     
-    startBtn.innerText = "Reintentar Desafío";
+    startBtn.innerText = "Reintentar Batalla";
     startBtn.style.display = 'block';
 }
 
@@ -458,7 +346,7 @@ function triggerMissEffect(key) {
     setTimeout(() => lane.classList.remove('miss-flash'), 300);
 }
 
-// --- LANZAR ANIMACIÓN DE DAÑO (MODO CAMPAÑA) ---
+// --- LANZAR ANIMACIÓN DE DAÑO ---
 function sendDamageToBoss() {
     const gameContainer = document.getElementById('game-container');
     const bossZone = document.getElementById('battle-ui'); 

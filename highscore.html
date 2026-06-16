@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Rhythm Battle Arena - Highscore</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .nav-back {
+            display: inline-block;
+            margin-top: 15px;
+            color: #a5b1c2;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+        .nav-back:hover { color: #ffa502; }
+        .highscore-ui-color { color: #ffa502 !important; }
+    </style>
+</head>
+<body>
+
+    <h1 id="game-title" style="color: #ffa502; text-shadow: 0 0 15px rgba(255, 165, 2, 0.6);">🏆 RHYTHM ARENA: HIGHSCORE 🏆</h1>
+    
+    <div id="battle-ui">
+        <div class="ui-box">
+            <h3 id="heart-title">❤️ Tu Vida</h3>
+            <div id="player-hearts">❤️</div>
+        </div>
+        
+        <div id="boss-zone">
+            <div id="boss-active-ui">
+                <h3 id="boss-name" style="color: #ffa502;">😈 Rey Ritmo (Bucle Infinito)</h3>
+                <div id="boss-health-bar" style="border-color: #ffa502;"><div id="boss-health-fill" style="background: #ffa502; width: 0%;"></div></div>
+                <div id="boss-dialogue">"¡A ver cuánto aguantas con 1 sola vida!"</div>
+            </div>
+            <div id="game-message" style="display: none;"></div>
+        </div>
+
+        <div class="ui-box">
+            <h3 id="score-title">⭐ Notas Acertadas</h3>
+            <div id="combo-counter" style="font-size: 24px; font-weight: bold; color: #ffa502;">0</div>
+        </div>
+    </div>
+
+    <div id="main-layout" style="display: flex; justify-content: center; align-items: flex-start;">
+        <div id="game-area">
+            <button id="start-btn" style="background: #ffa502; color: black;">¡Empezar Batalla!</button>
+            
+            <div id="game-container" style="border-color: #ffa502; box-shadow: 0 0 30px rgba(255, 165, 2, 0.2);">
+                <div id="lane-S" class="lane"></div>
+                <div id="lane-D" class="lane"></div>
+                <div id="lane-K" class="lane"></div>
+                <div id="lane-L" class="lane"></div>
+                
+                <div id="hit-bar"></div>
+                
+                <div class="key-indicator" style="left:0%;">S</div>
+                <div class="key-indicator" style="left:25%;">D</div>
+                <div class="key-indicator" style="left:50%;">K</div>
+                <div class="key-indicator" style="left:75%;">L</div>
+            </div>
+            
+            <a href="menu.html" class="nav-back">⬅️ Volver al Menú Principal</a>
+        </div>
+
+        <div id="highscore-panel">
+            <h3>🏆 TOP 10 RÉCORDS</h3>
+            <div id="highscore-list">
+                <div class="highscore-entry loading">Conectando con Firebase...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase App (the core Firebase SDK) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <!-- Firebase Realtime Database -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    
+    <!-- Lógica del Modo Highscore -->
+    <script src="highscore.js"></script>
+</body>
+</html>
