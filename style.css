@@ -1,203 +1,549 @@
-body {
-    background: #0f0c1b;
-    color: white;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    text-align: center;
-    margin: 0;
-    padding-bottom: 50px;
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Orbitron:wght@400;700;900&display=swap');
+
+/* ============================
+   ROOT VARIABLES & RESET
+   ============================ */
+:root {
+    --bg-deep:      #050410;
+    --bg-base:      #0a0818;
+    --bg-surface:   #0f0d1e;
+    --bg-card:      #13102a;
+    --accent-red:   #ff3a50;
+    --accent-gold:  #ffaa00;
+    --accent-green: #00f087;
+    --accent-cyan:  #00d8ff;
+    --accent-purple:#a855f7;
+    --text-primary: #e8e0ff;
+    --text-muted:   #8878aa;
+    --glow-red:     rgba(255,58,80,0.6);
+    --glow-gold:    rgba(255,170,0,0.6);
+    --glow-green:   rgba(0,240,135,0.6);
+    --glow-cyan:    rgba(0,216,255,0.6);
 }
 
-/* --- UI de Batalla --- */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    background: var(--bg-deep);
+    background-image:
+        radial-gradient(ellipse 80% 50% at 50% -10%, rgba(120,60,220,0.25) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 80% 80%, rgba(255,58,80,0.08) 0%, transparent 50%);
+    color: var(--text-primary);
+    font-family: 'Rajdhani', 'Segoe UI', sans-serif;
+    text-align: center;
+    min-height: 100vh;
+    padding-bottom: 60px;
+    overflow-x: hidden;
+}
+
+/* ============================
+   TYPOGRAPHY
+   ============================ */
+h1, h2, h3 {
+    font-family: 'Orbitron', sans-serif;
+}
+
+/* ============================
+   3D SCANLINE OVERLAY
+   ============================ */
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,0,0,0.06) 2px,
+        rgba(0,0,0,0.06) 4px
+    );
+    pointer-events: none;
+    z-index: 9999;
+}
+
+/* ============================
+   SCROLLBAR
+   ============================ */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-deep); }
+::-webkit-scrollbar-thumb { background: rgba(168,85,247,0.4); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(168,85,247,0.7); }
+
+/* ============================
+   BATTLE UI
+   ============================ */
 #battle-ui {
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 30px;
-    max-width: 900px;
+    max-width: 920px;
     margin: 15px auto;
-    background: #161224;
-    padding: 15px;
-    border-radius: 8px;
-    border: 2px solid #3d2f5c;
+    background: linear-gradient(135deg, rgba(19,16,42,0.95) 0%, rgba(15,13,30,0.95) 100%);
+    padding: 18px 20px;
+    border-radius: 16px;
+    border: 1px solid rgba(168,85,247,0.3);
+    box-shadow:
+        0 0 0 1px rgba(168,85,247,0.1),
+        0 8px 32px rgba(0,0,0,0.6),
+        inset 0 1px 0 rgba(255,255,255,0.05),
+        inset 0 -1px 0 rgba(0,0,0,0.3);
+    position: relative;
+    transform-style: preserve-3d;
 }
 
-.ui-box { width: 180px; }
-#player-hearts { font-size: 28px; color: #ff4757; letter-spacing: 2px; }
+#battle-ui::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 16px;
+    background: linear-gradient(135deg, rgba(168,85,247,0.06) 0%, transparent 50%);
+    pointer-events: none;
+}
+
+.ui-box { width: 190px; }
+
+#player-hearts {
+    font-size: 30px;
+    color: var(--accent-red);
+    letter-spacing: 3px;
+    text-shadow: 0 0 12px var(--glow-red);
+    filter: drop-shadow(0 0 8px var(--accent-red));
+}
 
 #boss-zone { flex-grow: 1; text-align: center; }
-#boss-name { margin: 0 0 5px 0; color: #ff4757; }
+
+#boss-name {
+    margin: 0 0 8px 0;
+    color: var(--accent-red);
+    font-size: 20px;
+    text-shadow: 0 0 15px var(--glow-red);
+    letter-spacing: 2px;
+}
+
 #boss-health-bar {
-    width: 100%; height: 20px; background: #222; 
-    border-radius: 10px; border: 2px solid #555; overflow: hidden;
+    width: 100%;
+    height: 18px;
+    background: rgba(0,0,0,0.5);
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.1);
+    overflow: hidden;
+    position: relative;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.5), 0 0 8px rgba(255,58,80,0.2);
 }
+
+#boss-health-bar::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(255,255,255,0.1) 0%, transparent 50%);
+    z-index: 1;
+    pointer-events: none;
+    border-radius: 10px;
+}
+
 #boss-health-fill {
-    width: 100%; height: 100%; background: #ff4757;
-    transition: width 0.3s ease-out;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, #c01020, #ff3a50, #ff6b7b);
+    transition: width 0.4s cubic-bezier(0.4,0,0.2,1);
+    box-shadow: 0 0 12px var(--glow-red);
+    position: relative;
 }
+
+#boss-health-fill::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 40%;
+    background: rgba(255,255,255,0.15);
+    border-radius: 10px 10px 0 0;
+}
+
 #boss-dialogue {
-    margin-top: 8px; font-style: italic; color: #a5b1c2; font-size: 14px;
+    margin-top: 8px;
+    font-style: italic;
+    color: var(--text-muted);
+    font-size: 13px;
     min-height: 20px;
+    font-family: 'Rajdhani', sans-serif;
 }
 
-/* --- Distribución del Juego --- */
-#main-layout { display: flex; justify-content: center; margin-top: 10px; }
-#game-area { position: relative; width: 400px; }
+/* ============================
+   GAME LAYOUT
+   ============================ */
+#main-layout {
+    display: flex;
+    justify-content: center;
+    margin-top: 12px;
+    perspective: 1200px;
+}
+
+#game-area { position: relative; width: 420px; }
+
 #game-container {
-    position: relative; width: 100%; height: 600px; background: #110e1a;
-    overflow: hidden; border: 4px solid #3d2f5c; border-radius: 10px;
-    box-shadow: 0 0 30px rgba(155, 89, 182, 0.2);
+    position: relative;
+    width: 100%;
+    height: 610px;
+    background:
+        linear-gradient(180deg, rgba(5,4,16,0.9) 0%, rgba(10,8,24,0.95) 100%);
+    overflow: hidden;
+    border-radius: 16px;
+    border: 1px solid rgba(168,85,247,0.25);
+    box-shadow:
+        0 0 0 1px rgba(168,85,247,0.1),
+        0 0 40px rgba(80,30,160,0.3),
+        0 20px 60px rgba(0,0,0,0.8),
+        inset 0 0 80px rgba(100,50,200,0.05);
+    transform-style: preserve-3d;
 }
 
-/* --- Carriles y Efectos --- */
-.lane { position: absolute; top: 0; width: 25%; height: 100%; border-right: 1px dashed #2c2542; box-sizing: border-box; transition: background 0.1s; }
-.lane:last-child { border-right: none; }
-#lane-S { left: 0%; } #lane-D { left: 25%; } #lane-K { left: 50%; } #lane-L { left: 75%; }
+/* Subtle 3D floor perspective at bottom of game container */
+#game-container::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 120px;
+    background: linear-gradient(180deg,
+        transparent 0%,
+        rgba(100,50,200,0.04) 50%,
+        rgba(100,50,200,0.12) 100%
+    );
+    pointer-events: none;
+    z-index: 0;
+}
 
-.lane.pressing { background: rgba(255, 255, 255, 0.05); }
-.lane.hit-flash { animation: flashGreen 0.2s ease-out; }
+/* ============================
+   LANES
+   ============================ */
+.lane {
+    position: absolute;
+    top: 0;
+    width: 25%;
+    height: 100%;
+    border-right: 1px solid rgba(80,60,120,0.2);
+    box-sizing: border-box;
+    transition: background 0.1s;
+    background: linear-gradient(180deg,
+        transparent 0%,
+        rgba(168,85,247,0.01) 100%
+    );
+}
+
+.lane:last-child { border-right: none; }
+#lane-S { left: 0%; }
+#lane-D { left: 25%; }
+#lane-K { left: 50%; }
+#lane-L { left: 75%; }
+
+.lane.pressing {
+    background: rgba(255,255,255,0.06) !important;
+}
+
+.lane.hit-flash  { animation: flashGreen 0.2s ease-out; }
 .lane.miss-flash { animation: flashRed 0.3s ease-out, shake 0.3s linear; }
 
-/* --- Notas --- */
-.note { position: absolute; width: 80%; left: 10%; height: 20px; border-radius: 5px; }
-.note.S { background: #ff4757; box-shadow: 0 0 10px #ff4757; } 
-.note.D { background: #2ed573; box-shadow: 0 0 10px #2ed573; } 
-.note.K { background: #ffa502; box-shadow: 0 0 10px #ffa502; } 
-.note.L { background: #1e90ff; box-shadow: 0 0 10px #1e90ff; } 
-
-#hit-bar {
-    position: absolute; bottom: 50px; width: 100%; height: 10px;
-    background: rgba(255,255,255,0.2); border-top: 2px solid white; border-bottom: 2px solid white;
+/* ============================
+   NOTES — 3D PILL STYLE
+   ============================ */
+.note {
+    position: absolute;
+    width: 78%;
+    left: 11%;
+    height: 22px;
+    border-radius: 6px;
+    transform-style: preserve-3d;
 }
-.key-indicator { position: absolute; bottom: 10px; width: 25%; font-weight: bold; font-size: 20px; color: #4e4376; }
 
+/* Top highlight sheen */
+.note::before {
+    content: '';
+    position: absolute;
+    top: 2px; left: 8%; right: 8%;
+    height: 35%;
+    background: rgba(255,255,255,0.35);
+    border-radius: 4px 4px 0 0;
+}
+
+/* Bottom shadow depth */
+.note::after {
+    content: '';
+    position: absolute;
+    bottom: -4px; left: 8%; right: 8%;
+    height: 4px;
+    border-radius: 0 0 4px 4px;
+    opacity: 0.7;
+}
+
+.note.S {
+    background: linear-gradient(180deg, #ff6b7b 0%, #cc1f30 100%);
+    box-shadow: 0 0 12px #ff3a50, 0 4px 0 #7a0010, 0 6px 15px rgba(255,58,80,0.5);
+}
+.note.S::after { background: #7a0010; }
+
+.note.D {
+    background: linear-gradient(180deg, #50ff9c 0%, #00a855 100%);
+    box-shadow: 0 0 12px #00f087, 0 4px 0 #005030, 0 6px 15px rgba(0,240,135,0.5);
+}
+.note.D::after { background: #005030; }
+
+.note.K {
+    background: linear-gradient(180deg, #ffd060 0%, #b86000 100%);
+    box-shadow: 0 0 12px #ffaa00, 0 4px 0 #7a4000, 0 6px 15px rgba(255,170,0,0.5);
+}
+.note.K::after { background: #7a4000; }
+
+.note.L {
+    background: linear-gradient(180deg, #60b8ff 0%, #005ec0 100%);
+    box-shadow: 0 0 12px #00d8ff, 0 4px 0 #003080, 0 6px 15px rgba(0,216,255,0.5);
+}
+.note.L::after { background: #003080; }
+
+/* ============================
+   HIT BAR
+   ============================ */
+#hit-bar {
+    position: absolute;
+    bottom: 52px;
+    width: 100%;
+    height: 12px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%);
+    border-top: 2px solid rgba(255,255,255,0.6);
+    border-bottom: 1px solid rgba(255,255,255,0.2);
+    box-shadow:
+        0 -2px 10px rgba(255,255,255,0.2),
+        0 2px 6px rgba(0,0,0,0.4);
+    z-index: 3;
+}
+
+/* 3D depth lines on hit bar */
+#hit-bar::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(90deg, transparent 24.9%, rgba(168,85,247,0.25) 25%, rgba(168,85,247,0.25) 25.1%, transparent 25.1%),
+        linear-gradient(90deg, transparent 49.9%, rgba(168,85,247,0.25) 50%, rgba(168,85,247,0.25) 50.1%, transparent 50.1%),
+        linear-gradient(90deg, transparent 74.9%, rgba(168,85,247,0.25) 75%, rgba(168,85,247,0.25) 75.1%, transparent 75.1%);
+}
+
+/* ============================
+   KEY INDICATORS
+   ============================ */
+.key-indicator {
+    position: absolute;
+    bottom: 12px;
+    width: 25%;
+    font-weight: 700;
+    font-size: 22px;
+    color: rgba(168,85,247,0.5);
+    font-family: 'Orbitron', sans-serif;
+    text-shadow: 0 0 8px rgba(168,85,247,0.3);
+    z-index: 3;
+    letter-spacing: 0;
+}
+
+/* ============================
+   BUTTONS — 3D EXTRUDED STYLE
+   ============================ */
 #start-btn {
-    position: absolute; top: 52%; left: 50%; transform: translate(-50%, -50%);
-    z-index: 10; background: #ff4757; border: none; padding: 15px 30px;
-    font-size: 18px; font-weight: bold; border-radius: 5px; cursor: pointer; color: white;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-    transition: all 0.2s;
+    position: absolute;
+    top: 52%; left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+    background: linear-gradient(180deg, #ff5565 0%, #d01830 100%);
+    border: none;
+    border-bottom: 4px solid #7a0010;
+    padding: 15px 35px;
+    font-size: 18px;
+    font-weight: 700;
+    border-radius: 8px;
+    cursor: pointer;
+    color: white;
+    font-family: 'Orbitron', sans-serif;
+    letter-spacing: 2px;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+    box-shadow:
+        0 0 0 1px rgba(255,255,255,0.1) inset,
+        0 0 30px rgba(255,58,80,0.5),
+        0 8px 25px rgba(0,0,0,0.5);
+    transition: all 0.15s cubic-bezier(0.4,0,0.2,1);
 }
 
 #start-btn:hover {
-    transform: translate(-50%, -50%) scale(1.05);
+    transform: translate(-50%, -52%) scale(1.05);
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.15) inset, 0 0 45px rgba(255,58,80,0.7), 0 12px 35px rgba(0,0,0,0.5);
+}
+
+#start-btn:active {
+    transform: translate(-50%, -49%);
+    border-bottom-width: 1px;
 }
 
 #next-boss-btn {
-    position: absolute; top: 36%; left: 50%; transform: translate(-50%, -50%);
-    z-index: 10; background: #2ed573; border: none; padding: 15px 30px;
-    font-size: 18px; font-weight: bold; border-radius: 5px; cursor: pointer; color: black;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-    transition: all 0.2s;
+    position: absolute;
+    top: 36%; left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+    background: linear-gradient(180deg, #30e880 0%, #00a845 100%);
+    border: none;
+    border-bottom: 4px solid #004820;
+    padding: 15px 35px;
+    font-size: 17px;
+    font-weight: 700;
+    border-radius: 8px;
+    cursor: pointer;
+    color: #001a0a;
+    font-family: 'Orbitron', sans-serif;
+    letter-spacing: 1px;
     text-transform: uppercase;
+    box-shadow:
+        0 0 0 1px rgba(255,255,255,0.15) inset,
+        0 0 30px rgba(0,240,135,0.4),
+        0 8px 25px rgba(0,0,0,0.5);
+    transition: all 0.15s cubic-bezier(0.4,0,0.2,1);
 }
 
 #next-boss-btn:hover {
-    background: #5ed98f;
-    transform: translate(-50%, -50%) scale(1.05);
+    transform: translate(-50%, -52%) scale(1.05);
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.2) inset, 0 0 45px rgba(0,240,135,0.6), 0 12px 35px rgba(0,0,0,0.5);
 }
 
-@keyframes flashGreen { 0% { background: rgba(46, 213, 115, 0.5); } 100% { background: rgba(46, 213, 115, 0); } }
-@keyframes flashRed { 0% { background: rgba(255, 71, 87, 0.5); } 100% { background: rgba(255, 71, 87, 0); } }
-@keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-5px); } 40%, 80% { transform: translateX(5px); } }
+#next-boss-btn:active {
+    transform: translate(-50%, -49%);
+    border-bottom-width: 1px;
+}
 
-/* --- ANIMACIÓN DE ATAQUE AL JURADO (DAÑO) --- */
+/* ============================
+   KEYFRAMES
+   ============================ */
+@keyframes flashGreen {
+    0%   { background: rgba(0,240,135,0.4); }
+    100% { background: transparent; }
+}
+@keyframes flashRed {
+    0%   { background: rgba(255,58,80,0.4); }
+    100% { background: transparent; }
+}
+@keyframes shake {
+    0%,100%  { transform: translateX(0); }
+    20%,60%  { transform: translateX(-5px); }
+    40%,80%  { transform: translateX(5px); }
+}
+
+/* ============================
+   DAMAGE PROJECTILE
+   ============================ */
 .damage-projectile {
     position: absolute;
-    bottom: 50px; /* Sale desde la hit-bar */
+    bottom: 50px;
     left: 50%;
     transform: translateX(-50%);
-    width: 20px;
-    height: 60px;
-    background: linear-gradient(to top, rgba(30, 144, 255, 0), #ffa502, #ffffff);
-    box-shadow: 0 0 20px #ffa502, 0 0 40px #ff4757;
+    width: 18px;
+    height: 55px;
+    background: linear-gradient(to top, transparent, #ffaa00, #ffffff);
+    box-shadow:
+        0 0 15px #ffaa00,
+        0 0 35px #ff3a50,
+        0 0 60px rgba(255,170,0,0.3);
     border-radius: 50% 50% 0 0;
     z-index: 5;
-    pointer-events: none; /* No interrumpe los clics */
-    animation: shootUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    pointer-events: none;
+    animation: shootUp 0.5s cubic-bezier(0.4,0,0.2,1) forwards;
 }
 
 @keyframes shootUp {
-    0% {
-        bottom: 50px;
-        height: 60px;
-        opacity: 1;
-        scale: 1;
-    }
-    80% {
-        opacity: 1;
-    }
-    100% {
-        bottom: 580px; /* Llega al borde superior de la pista */
-        height: 120px;
-        opacity: 0;
-        scale: 0.3;
-    }
+    0%   { bottom: 50px; height: 55px; opacity: 1; scale: 1; }
+    80%  { opacity: 1; }
+    100% { bottom: 590px; height: 120px; opacity: 0; scale: 0.2; }
 }
 
-/* Efecto de sacudida y flash rojo en la barra del jefe al recibir golpe */
+/* ============================
+   BOSS HURT FLASH
+   ============================ */
 .boss-hurt-flash {
     animation: flashHurt 0.3s ease-out, bossShake 0.3s linear;
 }
 
 @keyframes flashHurt {
-    0%, 100% { border-color: #3d2f5c; }
-    50% { border-color: #ff4757; background-color: rgba(255, 71, 87, 0.2); }
+    0%,100% { border-color: rgba(168,85,247,0.3); }
+    50% { border-color: #ff3a50; background-color: rgba(255,58,80,0.15); }
 }
 
 @keyframes bossShake {
-    0%, 100% { transform: translateX(0); }
-    20%, 60% { transform: translateX(-8px); }
-    40%, 80% { transform: translateX(8px); }
+    0%,100%  { transform: translateX(0); }
+    20%,60%  { transform: translateX(-8px); }
+    40%,80%  { transform: translateX(8px); }
 }
 
-/* --- MENSAJES DE FIN DE JUEGO --- */
+/* ============================
+   GAME MESSAGES
+   ============================ */
 #game-message {
-    font-size: 32px;
-    font-weight: bold;
+    font-size: 34px;
+    font-weight: 900;
     text-transform: uppercase;
-    letter-spacing: 2px;
+    letter-spacing: 3px;
     padding: 10px;
+    font-family: 'Orbitron', sans-serif;
     animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 }
 
 .msg-win {
-    color: #2ed573;
-    text-shadow: 0 0 15px rgba(46, 213, 115, 0.6);
+    color: var(--accent-green);
+    text-shadow: 0 0 20px var(--glow-green), 0 0 40px var(--glow-green);
 }
 
 .msg-lose {
-    color: #ff4757;
-    text-shadow: 0 0 15px rgba(255, 71, 87, 0.6);
+    color: var(--accent-red);
+    text-shadow: 0 0 20px var(--glow-red), 0 0 40px var(--glow-red);
 }
 
 @keyframes popIn {
-    0% { transform: scale(0.8); opacity: 0; }
-    100% { transform: scale(1); opacity: 1; }
+    0%   { transform: scale(0.6) rotateX(20deg); opacity: 0; }
+    100% { transform: scale(1) rotateX(0deg); opacity: 1; }
 }
 
-/* --- ZONA DE HIGHSCORES (MODO SUPERVIVENCIA) --- */
+/* ============================
+   HIGHSCORE PANEL
+   ============================ */
 #highscore-panel {
-    width: 200px;
-    height: 600px;
-    background: #161224;
-    border: 4px solid #ffa502;
-    border-radius: 10px;
-    margin-left: 20px;
+    width: 210px;
+    height: 610px;
+    background: linear-gradient(180deg, rgba(19,16,42,0.97) 0%, rgba(12,10,28,0.97) 100%);
+    border: 1px solid rgba(255,170,0,0.3);
+    border-radius: 16px;
+    margin-left: 22px;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    padding: 15px 10px;
-    box-shadow: 0 0 25px rgba(255, 165, 2, 0.15);
+    padding: 18px 12px;
+    box-shadow:
+        0 0 0 1px rgba(255,170,0,0.1),
+        0 0 30px rgba(255,170,0,0.1),
+        0 20px 60px rgba(0,0,0,0.7),
+        inset 0 1px 0 rgba(255,255,255,0.05);
+    position: relative;
+}
+
+#highscore-panel::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 60px;
+    background: linear-gradient(180deg, rgba(255,170,0,0.07) 0%, transparent 100%);
+    border-radius: 16px 16px 0 0;
+    pointer-events: none;
 }
 
 #highscore-panel h3 {
     margin: 0 0 15px 0;
-    color: #ffa502;
-    font-size: 16px;
-    letter-spacing: 1px;
+    color: var(--accent-gold);
+    font-size: 13px;
+    letter-spacing: 2px;
     text-transform: uppercase;
-    text-shadow: 0 0 10px rgba(255, 165, 2, 0.4);
-    font-weight: bold;
+    text-shadow: 0 0 12px var(--glow-gold);
+    font-weight: 700;
 }
 
 #highscore-list {
@@ -205,56 +551,58 @@ body {
     overflow-y: auto;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 7px;
     padding-right: 2px;
 }
 
-/* Scrollbar personalizado para la lista de highscores */
-#highscore-list::-webkit-scrollbar {
-    width: 4px;
-}
-#highscore-list::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.02);
-}
-#highscore-list::-webkit-scrollbar-thumb {
-    background: rgba(255, 165, 2, 0.3);
-    border-radius: 2px;
-}
-#highscore-list::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 165, 2, 0.5);
-}
+#highscore-list::-webkit-scrollbar { width: 3px; }
+#highscore-list::-webkit-scrollbar-track { background: rgba(255,255,255,0.02); }
+#highscore-list::-webkit-scrollbar-thumb { background: rgba(255,170,0,0.25); border-radius: 2px; }
+#highscore-list::-webkit-scrollbar-thumb:hover { background: rgba(255,170,0,0.45); }
 
 .highscore-entry {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 165, 2, 0.1);
-    border-radius: 5px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,170,0,0.1);
+    border-radius: 8px;
     padding: 8px 10px;
-    font-size: 13px;
+    font-size: 12px;
     transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.highscore-entry::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,170,0,0.2), transparent);
 }
 
 .highscore-entry:hover {
-    background: rgba(255, 165, 2, 0.08);
-    border-color: rgba(255, 165, 2, 0.3);
-    transform: translateX(2px);
+    background: rgba(255,170,0,0.06);
+    border-color: rgba(255,170,0,0.25);
+    transform: translateX(3px) scale(1.01);
+    box-shadow: 0 0 10px rgba(255,170,0,0.1);
 }
 
 .highscore-entry.loading {
     justify-content: center;
-    color: #a5b1c2;
+    color: var(--text-muted);
     font-style: italic;
     border: none;
     background: none;
 }
 
 .highscore-entry .rank {
-    font-weight: bold;
-    color: #ffa502;
+    font-weight: 700;
+    color: var(--accent-gold);
     margin-right: 6px;
-    font-size: 12px;
+    font-size: 11px;
+    font-family: 'Orbitron', sans-serif;
 }
 
 .highscore-entry .name {
@@ -263,19 +611,24 @@ body {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    color: #e2e8f0;
+    color: var(--text-primary);
     padding-right: 5px;
+    font-size: 12px;
 }
 
 .highscore-entry .score {
-    font-weight: bold;
+    font-weight: 700;
     color: #ffd27f;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 11px;
 }
 
+/* ============================
+   SAVE SCORE CONTAINER
+   ============================ */
 #save-score-container {
     position: absolute;
-    top: 28%;
-    left: 50%;
+    top: 28%; left: 50%;
     transform: translate(-50%, -50%);
     z-index: 10;
     display: flex;
@@ -285,55 +638,68 @@ body {
 }
 
 #player-name-input {
-    padding: 10px;
+    padding: 11px 14px;
     font-size: 14px;
-    border-radius: 6px;
-    border: 2px solid #3d2f5c;
-    background: #110e1a;
+    border-radius: 8px;
+    border: 1px solid rgba(168,85,247,0.3);
+    background: rgba(10,8,24,0.95);
     color: white;
     text-align: center;
-    width: 200px;
+    width: 210px;
     outline: none;
-    transition: border-color 0.2s;
+    font-family: 'Rajdhani', sans-serif;
+    transition: all 0.2s;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.4);
 }
 
 #player-name-input:focus {
-    border-color: #ffa502;
-    box-shadow: 0 0 10px rgba(255, 165, 2, 0.3);
+    border-color: var(--accent-gold);
+    box-shadow: 0 0 15px rgba(255,170,0,0.25), inset 0 2px 4px rgba(0,0,0,0.4);
 }
 
 #save-score-btn {
-    background: #ffa502;
-    color: black;
+    background: linear-gradient(180deg, #ffbe20 0%, #d08000 100%);
+    color: #1a0800;
     border: none;
-    padding: 10px 20px;
-    font-weight: bold;
-    border-radius: 6px;
+    border-bottom: 3px solid #8a5000;
+    padding: 11px 20px;
+    font-weight: 700;
+    border-radius: 8px;
     cursor: pointer;
-    font-size: 14px;
-    width: 224px;
+    font-size: 13px;
+    width: 234px;
     text-transform: uppercase;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-    transition: all 0.2s ease;
+    letter-spacing: 1px;
+    font-family: 'Orbitron', sans-serif;
+    box-shadow: 0 0 20px rgba(255,170,0,0.3), 0 4px 12px rgba(0,0,0,0.4);
+    transition: all 0.15s ease;
 }
 
 #save-score-btn:hover {
-    background: #ffb93a;
+    background: linear-gradient(180deg, #ffd050 0%, #e09010 100%);
     transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(255, 165, 2, 0.4);
+    box-shadow: 0 0 30px rgba(255,170,0,0.5), 0 8px 20px rgba(0,0,0,0.4);
+}
+
+#save-score-btn:active {
+    transform: translateY(1px);
+    border-bottom-width: 1px;
 }
 
 #save-score-btn:disabled {
-    background: #555;
-    color: #aaa;
+    background: linear-gradient(180deg, #444 0%, #333 100%);
+    color: #888;
     cursor: not-allowed;
     transform: none;
     box-shadow: none;
+    border-bottom-color: #222;
 }
 
-/* --- PANTALLA DE SELECCIÓN DE JEFES --- */
+/* ============================
+   BOSS SELECTION SCREEN
+   ============================ */
 .boss-selection-wrapper {
-    max-width: 700px;
+    max-width: 720px;
     margin: 40px auto;
     padding: 0 20px;
 }
@@ -341,235 +707,309 @@ body {
 .boss-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 40px 30px;
-    margin-top: 40px;
+    gap: 45px 35px;
+    margin-top: 45px;
+    perspective: 800px;
 }
 
+/* -------- Boss Card -------- */
 .boss-card {
     display: flex;
     flex-direction: column;
     align-items: center;
     position: relative;
     text-decoration: none;
+    transform-style: preserve-3d;
+    transition: transform 0.3s ease;
 }
 
+/* -------- Boss Circle (3D sphere look) -------- */
 .boss-circle {
-    width: 130px;
-    height: 130px;
+    width: 135px;
+    height: 135px;
     border-radius: 50%;
-    background: #161224;
-    border: 3px solid #3d2f5c;
+    background: radial-gradient(circle at 35% 30%, #2a1f50 0%, #110e22 60%, #0a0814 100%);
+    border: 2px solid rgba(80,60,120,0.5);
     display: flex;
     justify-content: center;
     align-items: center;
     position: relative;
     cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-    overflow: hidden; /* Clips the image into a circle */
+    transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow:
+        0 8px 20px rgba(0,0,0,0.6),
+        0 0 0 1px rgba(255,255,255,0.04) inset,
+        inset 0 -4px 8px rgba(0,0,0,0.5),
+        inset 4px 4px 12px rgba(255,255,255,0.05);
+    overflow: hidden;
+}
+
+/* Top specular highlight for 3D sphere effect */
+.boss-circle::before {
+    content: '';
+    position: absolute;
+    top: 10%;
+    left: 15%;
+    width: 40%;
+    height: 30%;
+    background: radial-gradient(ellipse, rgba(255,255,255,0.25) 0%, transparent 70%);
+    border-radius: 50%;
+    z-index: 2;
+    pointer-events: none;
+}
+
+/* Bottom rim light */
+.boss-circle::after {
+    content: '';
+    position: absolute;
+    bottom: 8%;
+    left: 20%;
+    width: 60%;
+    height: 15%;
+    background: radial-gradient(ellipse, rgba(168,85,247,0.2) 0%, transparent 70%);
+    border-radius: 50%;
+    z-index: 2;
+    pointer-events: none;
 }
 
 .boss-circle .emoji {
-    font-size: 48px;
+    font-size: 50px;
     transition: transform 0.3s ease;
+    z-index: 1;
 }
 
 .boss-img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.3s / 0.3s ease; /* smooth hover transitions */
-    transition-property: transform;
+    transition: transform 0.35s ease;
+    z-index: 1;
 }
 
 .boss-card.unlocked:hover .boss-img,
 .boss-card.current:hover .boss-img {
-    transform: scale(1.1);
+    transform: scale(1.12);
 }
 
 .boss-label {
-    margin-top: 12px;
-    font-weight: bold;
-    font-size: 15px;
-    color: #a5b1c2;
+    margin-top: 14px;
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--text-muted);
     transition: color 0.3s ease, text-shadow 0.3s ease;
     text-align: center;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 1.5px;
+    font-family: 'Orbitron', sans-serif;
 }
 
-/* Estado: DESBLOQUEADO (Ya superado) */
+/* --- UNLOCKED STATE --- */
 .boss-card.unlocked .boss-circle {
-    border-color: #2ed573;
-    box-shadow: 0 0 15px rgba(46, 213, 115, 0.15);
+    border-color: rgba(0,240,135,0.5);
+    box-shadow:
+        0 8px 20px rgba(0,0,0,0.5),
+        0 0 20px rgba(0,240,135,0.15),
+        inset 0 -4px 8px rgba(0,0,0,0.4),
+        inset 4px 4px 12px rgba(0,240,135,0.05);
 }
 
 .boss-card.unlocked:hover .boss-circle {
-    transform: scale(1.1);
-    box-shadow: 0 0 25px rgba(46, 213, 115, 0.4);
-    border-color: #2ed573;
+    transform: scale(1.1) translateY(-4px) rotateY(5deg);
+    box-shadow:
+        0 16px 35px rgba(0,0,0,0.6),
+        0 0 35px rgba(0,240,135,0.4),
+        inset 0 -4px 8px rgba(0,0,0,0.3),
+        inset 4px 4px 12px rgba(0,240,135,0.1);
+    border-color: var(--accent-green);
 }
 
-.boss-card.unlocked:hover .emoji {
-    transform: scale(1.15) rotate(5deg);
-}
+.boss-card.unlocked:hover .emoji { transform: scale(1.15) rotate(5deg); }
 
 .boss-card.unlocked:hover .boss-label {
-    color: #2ed573;
-    text-shadow: 0 0 10px rgba(46, 213, 115, 0.4);
+    color: var(--accent-green);
+    text-shadow: 0 0 12px var(--glow-green);
 }
 
-/* Estado: ACTUALMENTE EN BATALLA (El que toca jugar) */
+/* --- CURRENT STATE --- */
 .boss-card.current .boss-circle {
-    border-color: #ff4757;
-    box-shadow: 0 0 20px rgba(255, 71, 87, 0.3);
+    border-color: rgba(255,58,80,0.5);
+    box-shadow:
+        0 8px 20px rgba(0,0,0,0.5),
+        0 0 25px rgba(255,58,80,0.25),
+        inset 0 -4px 8px rgba(0,0,0,0.4),
+        inset 4px 4px 12px rgba(255,58,80,0.05);
+    animation: pulseCurrent 2.5s ease-in-out infinite;
+}
+
+@keyframes pulseCurrent {
+    0%,100% { box-shadow: 0 8px 20px rgba(0,0,0,0.5), 0 0 25px rgba(255,58,80,0.25), inset 0 -4px 8px rgba(0,0,0,0.4), inset 4px 4px 12px rgba(255,58,80,0.05); }
+    50%      { box-shadow: 0 8px 20px rgba(0,0,0,0.5), 0 0 40px rgba(255,58,80,0.45), inset 0 -4px 8px rgba(0,0,0,0.4), inset 4px 4px 12px rgba(255,58,80,0.1); }
 }
 
 .boss-card.current:hover .boss-circle {
-    transform: scale(1.1);
-    box-shadow: 0 0 30px rgba(255, 71, 87, 0.6);
-    border-color: #ff4757;
+    transform: scale(1.1) translateY(-4px) rotateY(-5deg);
+    box-shadow:
+        0 16px 35px rgba(0,0,0,0.6),
+        0 0 45px rgba(255,58,80,0.55),
+        inset 0 -4px 8px rgba(0,0,0,0.3),
+        inset 4px 4px 12px rgba(255,58,80,0.1);
+    border-color: var(--accent-red);
+    animation: none;
 }
 
 .boss-card.current:hover .boss-label {
-    color: #ff4757;
-    text-shadow: 0 0 10px rgba(255, 71, 87, 0.4);
+    color: var(--accent-red);
+    text-shadow: 0 0 12px var(--glow-red);
 }
 
-/* Estado: BLOQUEADO (Por nivel) */
-.boss-card.locked {
-    pointer-events: none;
-}
-
+/* --- LOCKED STATE --- */
+.boss-card.locked { pointer-events: none; }
 .boss-card.locked .boss-circle {
-    background: #0f0d18;
-    border-color: #221c35;
-    opacity: 0.4;
+    background: radial-gradient(circle at 35% 30%, #141020 0%, #0a0818 100%);
+    border-color: rgba(50,40,70,0.4);
+    opacity: 0.35;
     filter: grayscale(100%);
     cursor: not-allowed;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
 }
 
-/* Estado: PRÓXIMAMENTE (Filas 2 y 3) */
-.boss-card.coming-soon {
-    pointer-events: none;
-}
-
+/* --- COMING SOON STATE --- */
+.boss-card.coming-soon { pointer-events: none; }
 .boss-card.coming-soon .boss-circle {
-    background: #0d0a14;
-    border: 3px dashed #221c35;
-    opacity: 0.3;
+    background: rgba(8,6,16,0.8);
+    border: 2px dashed rgba(50,40,70,0.35);
+    opacity: 0.25;
     filter: grayscale(100%);
     box-shadow: none;
 }
+.boss-card.coming-soon .boss-label { color: #3a3050; }
 
-.boss-card.coming-soon .boss-label {
-    color: #555;
-}
-
-/* Insignias de Candado y Check */
+/* -------- Status Badge -------- */
 .status-badge {
     position: absolute;
-    bottom: 5px;
-    right: 5px;
-    width: 30px;
-    height: 30px;
+    bottom: 5px; right: 5px;
+    width: 32px; height: 32px;
     border-radius: 50%;
-    background: #110e1a;
-    border: 2px solid #555;
+    background: var(--bg-deep);
+    border: 2px solid rgba(80,60,120,0.5);
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 14px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
-    z-index: 2;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.05);
+    z-index: 3;
 }
 
 .boss-card.unlocked .status-badge {
-    border-color: #2ed573;
-    background: #0d281a;
+    border-color: rgba(0,240,135,0.5);
+    background: rgba(0,30,15,0.95);
+    box-shadow: 0 3px 8px rgba(0,0,0,0.6), 0 0 8px rgba(0,240,135,0.2);
 }
 
 .boss-card.current .status-badge {
-    border-color: #ff4757;
-    background: #2b0c13;
+    border-color: rgba(255,58,80,0.5);
+    background: rgba(35,8,15,0.95);
+    box-shadow: 0 3px 8px rgba(0,0,0,0.6), 0 0 8px rgba(255,58,80,0.2);
 }
 
 .boss-card.locked .status-badge,
 .boss-card.coming-soon .status-badge {
-    border-color: #444;
-    background: #1a1a1a;
+    border-color: rgba(50,40,70,0.4);
+    background: rgba(15,12,25,0.9);
 }
 
-/* Botón de reset */
+/* ============================
+   RESET BUTTON
+   ============================ */
 .btn-reset-prog {
     background: none;
-    border: 1px solid rgba(255, 71, 87, 0.4);
-    color: rgba(255, 71, 87, 0.7);
-    padding: 8px 16px;
-    font-size: 13px;
-    font-weight: bold;
-    border-radius: 4px;
+    border: 1px solid rgba(255,58,80,0.3);
+    color: rgba(255,58,80,0.6);
+    padding: 9px 18px;
+    font-size: 12px;
+    font-weight: 700;
+    border-radius: 6px;
     cursor: pointer;
     margin-top: 40px;
     transition: all 0.2s;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 1px;
+    font-family: 'Orbitron', sans-serif;
 }
 
 .btn-reset-prog:hover {
-    background: rgba(255, 71, 87, 0.1);
-    color: #ff4757;
-    border-color: #ff4757;
+    background: rgba(255,58,80,0.08);
+    color: var(--accent-red);
+    border-color: var(--accent-red);
+    box-shadow: 0 0 15px rgba(255,58,80,0.2);
 }
 
-/* --- PLACA DE NOTAS ACTUALES (MODO HIGHSCORE) --- */
+/* ============================
+   HIGHSCORE CURRENT BADGE
+   ============================ */
 #highscore-current-badge {
     position: absolute;
-    top: 12px;
-    left: 15px;
-    color: rgba(255, 165, 2, 0.85);
-    font-size: 13px;
-    font-weight: bold;
+    top: 12px; left: 15px;
+    color: rgba(255,170,0,0.9);
+    font-size: 12px;
+    font-weight: 700;
     z-index: 5;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 1px;
     pointer-events: none;
-    text-shadow: 0 0 5px rgba(255, 165, 2, 0.4);
+    text-shadow: 0 0 8px rgba(255,170,0,0.5);
+    font-family: 'Orbitron', sans-serif;
 }
 
-/* --- BOTÓN DE MUTEAR MÚSICA FLOTANTE --- */
+/* ============================
+   MUTE BUTTON
+   ============================ */
 .mute-music-btn {
     position: fixed;
-    bottom: 20px;
-    right: 20px;
+    bottom: 22px; right: 22px;
     z-index: 100;
-    background: #ffa502;
-    color: black;
+    background: linear-gradient(135deg, #ffbe20 0%, #d08000 100%);
+    color: #1a0800;
     border: none;
+    border-bottom: 3px solid #7a4800;
     padding: 10px;
     border-radius: 50%;
-    width: 45px;
-    height: 45px;
+    width: 48px; height: 48px;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 20px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    box-shadow:
+        0 0 20px rgba(255,170,0,0.3),
+        0 6px 18px rgba(0,0,0,0.5);
     transition: all 0.2s ease;
 }
 
 .mute-music-btn:hover {
-    transform: scale(1.1);
+    transform: scale(1.12) translateY(-2px);
+    box-shadow: 0 0 30px rgba(255,170,0,0.5), 0 10px 25px rgba(0,0,0,0.5);
+}
+
+.mute-music-btn:active {
+    transform: scale(0.95);
+    border-bottom-width: 1px;
 }
 
 .mute-music-btn.campana-theme {
-    background: #ff4757;
+    background: linear-gradient(135deg, #ff5565 0%, #c01830 100%);
     color: white;
+    border-bottom-color: #7a0010;
+    box-shadow: 0 0 20px rgba(255,58,80,0.3), 0 6px 18px rgba(0,0,0,0.5);
+}
+
+.mute-music-btn.campana-theme:hover {
+    box-shadow: 0 0 30px rgba(255,58,80,0.5), 0 10px 25px rgba(0,0,0,0.5);
 }
 
 .mute-music-btn.muted {
-    background: #555 !important;
-    color: #aaa !important;
-    box-shadow: none;
+    background: linear-gradient(135deg, #444 0%, #2a2a2a 100%) !important;
+    color: #666 !important;
+    box-shadow: none !important;
+    border-bottom-color: #1a1a1a !important;
 }

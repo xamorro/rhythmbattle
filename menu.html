@@ -2,171 +2,473 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rhythm Battle Arena - Menú Principal</title>
+    <meta name="description" content="Rhythm Battle Arena - elige tu modo de juego y domina el ritmo">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <style>
-        /* Estilos específicos para la distribución y diseño de las tarjetas del menú */
+        /* ── PARTICLES CANVAS ── */
+        #particles-canvas {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ── MENU WRAPPER ── */
         .menu-wrapper {
-            max-width: 800px;
-            margin: 40px auto;
-            padding: 0 20px;
+            position: relative;
+            z-index: 1;
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 0 24px 80px;
+        }
+
+        /* ── HEADER ── */
+        .menu-header {
+            padding-top: 50px;
+            margin-bottom: 50px;
+        }
+
+        .menu-logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 48px;
+            font-weight: 900;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            background: linear-gradient(135deg, #ffffff 0%, #d0b8ff 40%, #a855f7 70%, #ff3a50 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0;
+            line-height: 1.1;
+            filter: drop-shadow(0 0 30px rgba(168,85,247,0.4));
+        }
+
+        .menu-logo-sub {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 11px;
+            letter-spacing: 8px;
+            color: rgba(168,85,247,0.6);
+            text-transform: uppercase;
+            margin-top: 6px;
+            margin-bottom: 0;
+        }
+
+        .menu-divider {
+            width: 180px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(168,85,247,0.8), transparent);
+            margin: 20px auto;
         }
 
         .welcome-subtitle {
-            color: #a5b1c2;
+            color: rgba(136,120,170,0.9);
             font-style: italic;
-            margin-bottom: 40px;
-            font-size: 18px;
+            font-size: 16px;
+            font-family: 'Rajdhani', sans-serif;
+            letter-spacing: 1px;
         }
 
-        /* Contenedor de opciones de juego en cuadrícula 2x2 */
+        /* ── GRID ── */
         .modes-container {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 25px;
+            gap: 22px;
+            perspective: 1000px;
         }
 
-        /* Tarjeta contenedora para cada modo */
+        /* ── MODE CARD — 3D EXTRUSION ── */
         .mode-card {
-            background: #161224;
-            border: 2px solid #3d2f5c;
-            border-radius: 10px;
-            padding: 25px;
+            position: relative;
+            background: linear-gradient(145deg, rgba(19,16,42,0.95) 0%, rgba(12,10,26,0.98) 100%);
+            border-radius: 18px;
+            padding: 28px 26px 22px;
             text-align: left;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
+            height: 260px;
             box-sizing: border-box;
-            height: 250px;
+            cursor: pointer;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.04);
+            box-shadow:
+                0 2px 0 rgba(255,255,255,0.04) inset,
+                0 -1px 0 rgba(0,0,0,0.5) inset,
+                0 10px 30px rgba(0,0,0,0.5),
+                0 20px 60px rgba(0,0,0,0.3);
+            transform-style: preserve-3d;
+            transition:
+                transform 0.4s cubic-bezier(0.23,1,0.32,1),
+                box-shadow 0.4s ease;
         }
 
-        /* Sección de textos descriptivos */
-        .mode-info {
-            width: 100%;
+        /* Top-edge highlight for 3D "lid" effect */
+        .mode-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
         }
+
+        /* Bottom shadow bar for extrusion depth */
+        .mode-card::after {
+            content: '';
+            position: absolute;
+            bottom: -6px; left: 8%; right: 8%;
+            height: 6px;
+            border-radius: 0 0 18px 18px;
+            opacity: 0.6;
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+
+        /* Background glow blob */
+        .mode-card .card-glow {
+            position: absolute;
+            top: -30%;
+            right: -20%;
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            opacity: 0.08;
+            filter: blur(50px);
+            transition: opacity 0.4s ease, transform 0.4s ease;
+            pointer-events: none;
+        }
+
+        /* Hover 3D tilt + lift */
+        .mode-card:hover {
+            transform: translateY(-8px) rotateX(3deg) rotateY(-1deg);
+        }
+
+        .mode-card:hover .card-glow {
+            opacity: 0.18;
+            transform: scale(1.2);
+        }
+
+        .mode-card:hover::after {
+            opacity: 0.4;
+            transform: scaleY(0.6);
+        }
+
+        /* ── ICON BADGE ── */
+        .mode-icon {
+            font-size: 36px;
+            margin-bottom: 12px;
+            display: block;
+            filter: drop-shadow(0 0 8px currentColor);
+            transition: transform 0.3s ease;
+        }
+
+        .mode-card:hover .mode-icon {
+            transform: scale(1.15) rotateY(10deg);
+        }
+
+        /* ── TEXTS ── */
+        .mode-info { width: 100%; }
 
         .mode-title {
-            margin: 0 0 10px 0;
-            font-size: 22px;
-            font-weight: bold;
-            letter-spacing: 1px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            margin: 0 0 8px 0;
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
         }
 
         .mode-description {
-            margin: 0 0 15px 0;
-            color: #a5b1c2;
-            font-size: 14px;
-            line-height: 1.4;
+            margin: 0 0 16px 0;
+            color: rgba(136,120,170,0.85);
+            font-size: 13.5px;
+            line-height: 1.5;
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 500;
         }
 
-        /* Botones de acción universales */
+        /* ── ACTION BUTTON — 3D EXTRUSION ── */
         .mode-btn {
+            display: block;
             border: none;
             padding: 12px 20px;
-            font-size: 15px;
-            font-weight: bold;
-            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 700;
+            border-radius: 8px;
             cursor: pointer;
-            color: white;
             text-decoration: none;
             text-transform: uppercase;
             text-align: center;
             width: 100%;
             box-sizing: border-box;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            transition: all 0.2s ease;
-            margin-top: auto;
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 1.5px;
+            transition: all 0.15s cubic-bezier(0.4,0,0.2,1);
+            position: relative;
+            z-index: 1;
         }
 
-        /* --- Variaciones visuales y de color por modo --- */
+        .mode-btn:active {
+            transform: translateY(2px) !important;
+        }
 
-        /* 1. MODO CAMPAÑA (Rojo Neón) */
-        .mode-card.campana { border-color: rgba(255, 71, 87, 0.4); }
-        .mode-card.campana:hover { border-color: #ff4757; box-shadow: 0 0 20px rgba(255, 71, 87, 0.2); }
-        .btn-campana { background: #ff4757; }
-        .btn-campana:hover { background: #ff6b7b; transform: translateY(-2px); box-shadow: 0 6px 15px rgba(255, 71, 87, 0.4); }
+        /* ── PER-MODE COLORS ── */
 
-        /* 2. MODO HIGHSCORE (Naranja/Amarillo Neón) */
-        .mode-card.highscore { border-color: rgba(255, 165, 2, 0.4); }
-        .mode-card.highscore:hover { border-color: #ffa502; box-shadow: 0 0 20px rgba(255, 165, 2, 0.2); }
-        .btn-highscore { background: #ffa502; color: black; }
-        .btn-highscore:hover { background: #ffb93a; transform: translateY(-2px); box-shadow: 0 6px 15px rgba(255, 165, 2, 0.4); }
+        /* CAMPAÑA */
+        .mode-card.campana {
+            border-color: rgba(255,58,80,0.15);
+            box-shadow:
+                0 2px 0 rgba(255,255,255,0.04) inset,
+                0 -1px 0 rgba(0,0,0,0.5) inset,
+                0 10px 30px rgba(0,0,0,0.5),
+                0 20px 60px rgba(255,58,80,0.04);
+        }
+        .mode-card.campana::after { background: #7a0010; }
+        .mode-card.campana:hover {
+            border-color: rgba(255,58,80,0.35);
+            box-shadow:
+                0 2px 0 rgba(255,255,255,0.05) inset,
+                0 -1px 0 rgba(0,0,0,0.5) inset,
+                0 20px 50px rgba(255,58,80,0.2),
+                0 30px 80px rgba(0,0,0,0.4);
+        }
+        .mode-card.campana .card-glow { background: #ff3a50; }
+        .btn-campana {
+            background: linear-gradient(180deg, #ff5565 0%, #cc1025 100%);
+            color: white;
+            border-bottom: 3px solid #7a0010;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+            box-shadow: 0 0 20px rgba(255,58,80,0.3);
+        }
+        .btn-campana:hover {
+            background: linear-gradient(180deg, #ff7080 0%, #dd2035 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 0 30px rgba(255,58,80,0.5), 0 6px 15px rgba(0,0,0,0.4);
+        }
 
-        /* 3. MODO CREACIÓN (Verde Neón) */
-        .mode-card.creacion { border-color: rgba(46, 213, 115, 0.4); }
-        .mode-card.creacion:hover { border-color: #2ed573; box-shadow: 0 0 20px rgba(46, 213, 115, 0.2); }
-        .btn-creacion { background: #2ed573; color: black; }
-        .btn-creacion:hover { background: #5ed98f; transform: translateY(-2px); box-shadow: 0 6px 15px rgba(46, 213, 115, 0.4); }
+        /* HIGHSCORE */
+        .mode-card.highscore {
+            border-color: rgba(255,170,0,0.15);
+        }
+        .mode-card.highscore::after { background: #7a4800; }
+        .mode-card.highscore:hover {
+            border-color: rgba(255,170,0,0.35);
+            box-shadow:
+                0 2px 0 rgba(255,255,255,0.05) inset,
+                0 -1px 0 rgba(0,0,0,0.5) inset,
+                0 20px 50px rgba(255,170,0,0.15),
+                0 30px 80px rgba(0,0,0,0.4);
+        }
+        .mode-card.highscore .card-glow { background: #ffaa00; }
+        .btn-highscore {
+            background: linear-gradient(180deg, #ffbe20 0%, #c07800 100%);
+            color: #1a0800;
+            border-bottom: 3px solid #7a4800;
+            text-shadow: 0 1px 0 rgba(255,255,255,0.2);
+            box-shadow: 0 0 20px rgba(255,170,0,0.3);
+        }
+        .btn-highscore:hover {
+            background: linear-gradient(180deg, #ffd050 0%, #d08800 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 0 35px rgba(255,170,0,0.5), 0 6px 15px rgba(0,0,0,0.4);
+        }
 
-        /* 4. MODO MUSICOTE (Cian Neón) */
-        .mode-card.musicote { border-color: rgba(0, 210, 211, 0.4); }
-        .mode-card.musicote:hover { border-color: #00d2d3; box-shadow: 0 0 20px rgba(0, 210, 211, 0.2); }
-        .btn-musicote { background: #00d2d3; color: black; }
-        .btn-musicote:hover { background: #00e8e9; transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0, 210, 211, 0.4); }
+        /* CREACIÓN */
+        .mode-card.creacion {
+            border-color: rgba(0,240,135,0.15);
+        }
+        .mode-card.creacion::after { background: #004820; }
+        .mode-card.creacion:hover {
+            border-color: rgba(0,240,135,0.35);
+            box-shadow:
+                0 2px 0 rgba(255,255,255,0.05) inset,
+                0 -1px 0 rgba(0,0,0,0.5) inset,
+                0 20px 50px rgba(0,240,135,0.15),
+                0 30px 80px rgba(0,0,0,0.4);
+        }
+        .mode-card.creacion .card-glow { background: #00f087; }
+        .btn-creacion {
+            background: linear-gradient(180deg, #30e880 0%, #009850 100%);
+            color: #001a08;
+            border-bottom: 3px solid #004820;
+            text-shadow: 0 1px 0 rgba(255,255,255,0.2);
+            box-shadow: 0 0 20px rgba(0,240,135,0.25);
+        }
+        .btn-creacion:hover {
+            background: linear-gradient(180deg, #50ff98 0%, #10a860 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 0 35px rgba(0,240,135,0.5), 0 6px 15px rgba(0,0,0,0.4);
+        }
 
-        /* Adaptación móvil o pantallas compactas */
-        @media (max-width: 768px) {
+        /* MUSICOTE */
+        .mode-card.musicote {
+            border-color: rgba(0,216,255,0.15);
+        }
+        .mode-card.musicote::after { background: #003868; }
+        .mode-card.musicote:hover {
+            border-color: rgba(0,216,255,0.35);
+            box-shadow:
+                0 2px 0 rgba(255,255,255,0.05) inset,
+                0 -1px 0 rgba(0,0,0,0.5) inset,
+                0 20px 50px rgba(0,216,255,0.15),
+                0 30px 80px rgba(0,0,0,0.4);
+        }
+        .mode-card.musicote .card-glow { background: #00d8ff; }
+        .btn-musicote {
+            background: linear-gradient(180deg, #20d8ff 0%, #007aaa 100%);
+            color: #001825;
+            border-bottom: 3px solid #003868;
+            text-shadow: 0 1px 0 rgba(255,255,255,0.2);
+            box-shadow: 0 0 20px rgba(0,216,255,0.25);
+        }
+        .btn-musicote:hover {
+            background: linear-gradient(180deg, #40e8ff 0%, #009acc 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 0 35px rgba(0,216,255,0.5), 0 6px 15px rgba(0,0,0,0.4);
+        }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 640px) {
+            .menu-logo { font-size: 32px; letter-spacing: 2px; }
             .modes-container { grid-template-columns: 1fr; }
-            .mode-card { height: auto; min-height: 250px; }
+            .mode-card { height: auto; min-height: 230px; }
         }
     </style>
 </head>
 <body>
+    <canvas id="particles-canvas"></canvas>
 
     <div class="menu-wrapper">
-        <h1 style="margin-top: 40px; font-size: 42px;">⚔️ RHYTHM BATTLE ARENA ⚔️</h1>
-        <div class="welcome-subtitle">Selecciona tu modo de juego y domina el tempo</div>
+        <header class="menu-header">
+            <h1 class="menu-logo">⚔ Rhythm Battle Arena</h1>
+            <p class="menu-logo-sub">Select your mode &bull; Dominate the beat</p>
+            <div class="menu-divider"></div>
+            <p class="welcome-subtitle">Selecciona tu modo de juego y domina el tempo</p>
+        </header>
 
         <div class="modes-container">
-            
+
+            <!-- CAMPAÑA -->
             <div class="mode-card campana">
+                <div class="card-glow"></div>
                 <div class="mode-info">
-                    <h2 class="mode-title" style="color: #ff4757;">🛡️ Modo Campaña</h2>
+                    <span class="mode-icon">🛡️</span>
+                    <h2 class="mode-title" style="color:#ff5565;">Modo Campaña</h2>
                     <p class="mode-description">
                         Enfréntate al temible <strong>Rey Ritmo</strong> en un duelo clásico de llamada y respuesta con 3 vidas. Memoriza sus combos y devuélvele la secuencia perfecta.
                     </p>
                 </div>
-                <a href="seleccion_boss.html" class="mode-btn btn-campana">Iniciar Duelo</a>
+                <a id="btn-campana" href="seleccion_boss.html" class="mode-btn btn-campana">Iniciar Duelo</a>
             </div>
 
+            <!-- HIGHSCORE -->
             <div class="mode-card highscore">
+                <div class="card-glow"></div>
                 <div class="mode-info">
-                    <h2 class="mode-title" style="color: #ffa502;">🏆 Modo Highscore</h2>
+                    <span class="mode-icon">🏆</span>
+                    <h2 class="mode-title" style="color:#ffaa00;">Modo Highscore</h2>
                     <p class="mode-description">
-                        Una corriente infinita de notas aleatorias a toda velocidad. Solo posees <strong>1 sola vida (❤️)</strong>. ¿Qué puntuación registrarás en el ranking online?
+                        Una corriente infinita de notas aleatorias a toda velocidad. Solo posees <strong>1 sola vida ❤️</strong>. ¿Qué puntuación registrarás en el ranking online?
                     </p>
                 </div>
-                <a href="highscore.html" class="mode-btn btn-highscore">Romper Récord</a>
+                <a id="btn-highscore" href="highscore.html" class="mode-btn btn-highscore">Romper Récord</a>
             </div>
 
+            <!-- CREACIÓN -->
             <div class="mode-card creacion">
+                <div class="card-glow"></div>
                 <div class="mode-info">
-                    <h2 class="mode-title" style="color: #2ed573;">🎙️ Modo Creación</h2>
+                    <span class="mode-icon">🎙️</span>
+                    <h2 class="mode-title" style="color:#00f087;">Modo Creación</h2>
                     <p class="mode-description">
-                        Carga tus canciones locales en MP3, ponles nombre y graba tus propias notas en vivo pulsando las teclas físico-rítmicas (`S`, `D`, `K`, `L`).
+                        Carga tus canciones locales en MP3, ponles nombre y graba tus propias notas en vivo pulsando las teclas físico-rítmicas (<code>S</code>, <code>D</code>, <code>K</code>, <code>L</code>).
                     </p>
                 </div>
-                <a href="editor_local.html" class="mode-btn btn-creacion">Abrir Editor</a>
+                <a id="btn-creacion" href="editor_local.html" class="mode-btn btn-creacion">Abrir Editor</a>
             </div>
 
+            <!-- MUSICOTE -->
             <div class="mode-card musicote">
+                <div class="card-glow"></div>
                 <div class="mode-info">
-                    <h2 class="mode-title" style="color: #00d2d3;">🎵 Modo Musicote</h2>
+                    <span class="mode-icon">🎵</span>
+                    <h2 class="mode-title" style="color:#00d8ff;">Modo Musicote</h2>
                     <p class="mode-description">
-                        Juega los niveles creados por la comunidad o creados por ti. Selecciona el mapa de notas, asócialo con su archivo MP3 local y ¡a jugar!
+                        Juega los niveles creados por la comunidad o por ti. Selecciona el mapa de notas, asócialo con su archivo MP3 local y ¡a jugar!
                     </p>
                 </div>
-                <a href="musicote.html" class="mode-btn btn-musicote">Jugar Canciones</a>
+                <a id="btn-musicote" href="musicote.html" class="mode-btn btn-musicote">Jugar Canciones</a>
             </div>
 
         </div>
     </div>
 
+    <script>
+        /* ── FLOATING PARTICLES ── */
+        (function() {
+            const canvas = document.getElementById('particles-canvas');
+            const ctx = canvas.getContext('2d');
+            let W, H, particles = [];
+
+            function resize() {
+                W = canvas.width  = window.innerWidth;
+                H = canvas.height = window.innerHeight;
+            }
+
+            const COLORS = ['rgba(168,85,247,', 'rgba(255,58,80,', 'rgba(0,216,255,', 'rgba(255,170,0,'];
+
+            function spawn() {
+                return {
+                    x: Math.random() * W,
+                    y: H + 10,
+                    r: Math.random() * 1.8 + 0.4,
+                    speed: Math.random() * 0.6 + 0.2,
+                    opacity: Math.random() * 0.5 + 0.1,
+                    color: COLORS[Math.floor(Math.random() * COLORS.length)],
+                    drift: (Math.random() - 0.5) * 0.3,
+                };
+            }
+
+            for (let i = 0; i < 80; i++) {
+                const p = spawn();
+                p.y = Math.random() * H; // spread on init
+                particles.push(p);
+            }
+
+            function frame() {
+                ctx.clearRect(0, 0, W, H);
+                particles.forEach((p, i) => {
+                    p.y  -= p.speed;
+                    p.x  += p.drift;
+                    if (p.y < -10) particles[i] = spawn();
+
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                    ctx.fillStyle = p.color + p.opacity + ')';
+                    ctx.fill();
+                });
+                requestAnimationFrame(frame);
+            }
+
+            window.addEventListener('resize', resize);
+            resize();
+            frame();
+        })();
+
+        /* ── 3D TILT ON MOUSE MOVE ── */
+        document.querySelectorAll('.mode-card').forEach(card => {
+            card.addEventListener('mousemove', e => {
+                const r = card.getBoundingClientRect();
+                const x = (e.clientX - r.left) / r.width  - 0.5;  // -0.5 to 0.5
+                const y = (e.clientY - r.top)  / r.height - 0.5;
+                card.style.transform = `translateY(-8px) rotateX(${-y * 8}deg) rotateY(${x * 8}deg)`;
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = '';
+            });
+        });
+    </script>
 </body>
 </html>
